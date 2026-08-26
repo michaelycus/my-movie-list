@@ -1,15 +1,15 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import type { BrowseSort } from "@/lib/movies/browse";
+import { buildSearchHref, type BrowseParams } from "@/lib/movies/browse";
 
 function PageLink({
-  sort,
+  params,
   page,
   disabled,
   children,
 }: {
-  sort: BrowseSort;
+  params: BrowseParams;
   page: number;
   disabled: boolean;
   children: ReactNode;
@@ -30,19 +30,17 @@ function PageLink({
   }
 
   return (
-    <Link href={`/?sort=${sort}&page=${page}`} className={className}>
+    <Link href={buildSearchHref(params, { page })} className={className}>
       {children}
     </Link>
   );
 }
 
 export function Pagination({
-  page,
-  sort,
+  params,
   totalPages,
 }: {
-  page: number;
-  sort: BrowseSort;
+  params: BrowseParams;
   totalPages: number;
 }) {
   return (
@@ -50,13 +48,13 @@ export function Pagination({
       aria-label="Pagination"
       className="flex items-center justify-center gap-4 pt-4"
     >
-      <PageLink sort={sort} page={page - 1} disabled={page <= 1}>
+      <PageLink params={params} page={params.page - 1} disabled={params.page <= 1}>
         Prev
       </PageLink>
       <span className="text-sm text-muted-foreground">
-        Page {page} of {totalPages}
+        Page {params.page} of {totalPages}
       </span>
-      <PageLink sort={sort} page={page + 1} disabled={page >= totalPages}>
+      <PageLink params={params} page={params.page + 1} disabled={params.page >= totalPages}>
         Next
       </PageLink>
     </nav>
