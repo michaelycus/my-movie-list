@@ -1,13 +1,8 @@
 # Coding Standards
 
-> Your conventions. Edit these once to match your stack. The defaults below
-> assume Next.js + TypeScript + Tailwind + Prisma; change or trim anything that
-> doesn't fit your project.
->
-> Run `/onboard` after installing the Blueprint. It tunes this file to the real
-> project stack, along with `AGENTS.md`, `CLAUDE.md` when present,
-> `ai-interaction.md`, `.gitignore`, and README placement. Review the result
-> before `/overview`.
+> CineMood's conventions: Next.js (App Router) + TypeScript + Tailwind v4 +
+> Supabase (Postgres, `pgvector`, Auth). No Prisma - Supabase RLS is the data
+> boundary. Package manager is npm.
 
 ## TypeScript
 
@@ -28,23 +23,22 @@
 - Server components by default
 - Only use `'use client'` when needed (interactivity, hooks, browser APIs)
 - Use Server Actions for form submissions and simple mutations
-- Use API routes when you need:
-  - Webhooks (Clerk, GitHub, etc.)
-  - File uploads with progress tracking
-  - Long-running operations
+- Use Route Handlers when you need:
+  - Search and recommendation endpoints that call OpenAI/OpenRouter (natural-language search parsing, group ranking)
+  - Webhooks (Supabase, TMDB, etc.)
   - Specific HTTP status codes or headers
   - Endpoints for future mobile/CLI clients
-  - Third-party integrations
 - Otherwise, fetch data directly in server components
-- Dynamic routes for item/collection pages
+- Dynamic routes for item/collection pages (film detail, session pages)
 
 ## File Organization
 
 - Components: `src/components/[feature]/ComponentName.tsx`
 - Pages: `src/app/[route]/page.tsx`
+- Route Handlers: `src/app/api/[route]/route.ts`
 - Server Actions: `src/actions/[feature].ts`
 - Types: `src/types/[feature].ts`
-- Lib/Utils: `src/lib/[utility].ts`
+- Lib/Utils: `src/lib/[utility].ts` (Supabase clients live in `src/lib/supabase/`)
 
 ## Naming
 
@@ -64,17 +58,18 @@
 
 ## Database
 
-- Use Prisma ORM for all database operations
-- Always use `prisma migrate dev` for schema changes (not `db push`)
-- Run `prisma migrate status` before committing to verify migrations are in sync
-- Production deployments must run `prisma migrate deploy` before the app starts
+- Postgres via Supabase, with `pgvector` for embeddings (see `blueprint/project-plan.md` §4 for schema)
+- Schema changes are checked-in SQL migrations under `supabase/migrations`, applied with the Supabase CLI - never edit the hosted schema by hand
+- Ranking and retrieval that touch vectors run as Postgres RPC functions (`match_movies`, `score_group`), not client-side scoring, so ranking stays in the database
+- Row-Level Security is on for every user-owned table (`friends`, `sessions`, `session_participants`, `seen_movies`); `movies`, `genres`, `movie_cast`, `movie_crew` are readable by `anon`
 
 ## Data Fetching
 
-- Server components fetch directly with Prisma
-- Client components use Server Actions
+- Server components fetch directly with the Supabase server client (`@supabase/ssr`)
+- Client components use Server Actions for mutations
 - Validate all inputs with Zod
-- Scope every user-owned query by the authenticated Clerk user id (`clerkUserId`); never trust a client-supplied user id
+- Scope every user-owned query by `owner_id = auth.uid()`; never trust a client-supplied user id. RLS enforces this at the database level too, but application queries should not rely on RLS alone as the only check
+- `OPENAI_API_KEY`, `OPENROUTER_API_KEY`, `TMDB_API_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` are server-only and must never reach a Client Component or be passed to the browser; only `NEXT_PUBLIC_SUPABASE_URL` and the anon key are public
 
 ## Error Handling
 
@@ -125,9 +120,9 @@ of the switch; the skills and `ai-interaction.md` only point back here.
 - Run them via the project's test command (see Commands in `AGENTS.md`), not a
   hardcoded tool name.
 
-Stack binding (swap for yours): a TypeScript app uses Vitest, `vi.mock()` for
-external dependencies (Prisma, Clerk, etc.), and `vi.useFakeTimers()` for
-time-dependent logic; a Python app would use pytest; a Go app `go test`.
+Stack binding: Vitest, with `vi.mock()` for external dependencies (Supabase
+client, OpenAI/OpenRouter calls, TMDB API) and `vi.useFakeTimers()` for
+time-dependent logic.
 
 ## Browser Verification
 

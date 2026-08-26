@@ -7,7 +7,10 @@ this file, so there is a single source of truth.
 
 ## What this is
 
-A description of your project and the problem it solves.
+**CineMood** picks a film a whole group will actually enjoy, in under a minute.
+It stores each friend's taste profile and tonight's mood, then ranks the catalog
+so the result is a good compromise rather than one loud person's favourite. Solo
+search works too, in natural language ("something funny but not stupid").
 
 This project is built with the **AI Blueprint**, a workflow layer, not an
 app skeleton. To start a new project, scaffold the app first in an empty folder
@@ -142,13 +145,14 @@ checks do not make the Blueprint unusable.
 
 ## Commands
 
-For a standard Next.js project. Change or remove if you're using something else.
+Next.js (App Router) + TypeScript, npm as the package manager.
 
 - Dev server: `npm run dev` (http://localhost:3000)
 - Build: `npm run build`
 - Production server: `npm run start`
 - Lint: `npm run lint`
 
-Testing is opt-in. If this project does not already have a unit test runner, run
-`/tests` or `$tests` to add one and update this section with the real test
-commands.
+No `test` command yet, so testing is not a gate. Run `/tests` or `$tests` to add
+a unit test runner and update this section with the real test commands. No
+`verify` command yet either; run `/ci` or `$ci` to define one once there is more
+than build/lint to combine.
