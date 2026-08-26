@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { BrowseMovie } from "@/types/movie";
 
 const POSTER_BASE_URL = "https://image.tmdb.org/t/p/w342";
@@ -13,33 +14,37 @@ export function PosterCard({ movie }: { movie: BrowseMovie }) {
 
   return (
     <article className="flex flex-col gap-2">
-      <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface-2">
-        {movie.posterPath ? (
-          <Image
-            src={`${POSTER_BASE_URL}${movie.posterPath}`}
-            alt={movie.title}
-            fill
-            unoptimized
-            sizes="(min-width: 1024px) 16vw, (min-width: 640px) 25vw, 45vw"
-            className="object-cover"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center px-2 text-center text-sm text-muted-foreground">
+      <Link href={`/films/${movie.id}`} className="contents">
+        <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface-2">
+          {movie.posterPath ? (
+            <Image
+              src={`${POSTER_BASE_URL}${movie.posterPath}`}
+              alt={movie.title}
+              fill
+              unoptimized
+              sizes="(min-width: 1024px) 16vw, (min-width: 640px) 25vw, 45vw"
+              className="object-cover"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center px-2 text-center text-sm text-muted-foreground">
+              {movie.title}
+            </div>
+          )}
+          {rating !== null && (
+            <span className="absolute top-1.5 right-1.5 rounded-full bg-background/80 px-1.5 py-0.5 text-xs font-medium text-neon-lime">
+              {rating.toFixed(1)}
+            </span>
+          )}
+        </div>
+        <div className="flex flex-col">
+          <span className="truncate text-sm font-medium text-foreground">
             {movie.title}
-          </div>
-        )}
-        {rating !== null && (
-          <span className="absolute top-1.5 right-1.5 rounded-full bg-background/80 px-1.5 py-0.5 text-xs font-medium text-neon-lime">
-            {rating.toFixed(1)}
           </span>
-        )}
-      </div>
-      <div className="flex flex-col">
-        <span className="truncate text-sm font-medium text-foreground">
-          {movie.title}
-        </span>
-        {year && <span className="text-xs text-muted-foreground">{year}</span>}
-      </div>
+          {year && (
+            <span className="text-xs text-muted-foreground">{year}</span>
+          )}
+        </div>
+      </Link>
     </article>
   );
 }
