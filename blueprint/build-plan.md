@@ -2,7 +2,7 @@
 
 - [ ] 1. **Film catalog ingest** - stream-parse `references/tmdb_5000_movies.csv` and `references/tmdb_5000_credits.csv`, join them on the TMDB id, normalise the JSON columns, enrich each film with poster path and age certification from the TMDB API, and land 5000 released films in the database
   - [x] 1a. **Database schema & Supabase admin client** - migration creating `pgvector`, the `movies`/`genres`/`movie_cast`/`movie_crew`/`ingest_checkpoint` tables with RLS and public-read policies, plus a service-role Supabase client for scripts
-  - [ ] 1b. **CSV parse, join, and normalize** - stream-parse both CSVs, join on the TMDB id, normalize genres/keywords/cast/crew, filter to `Released`, compute the Bayesian `weighted_rating`
+  - [x] 1b. **CSV parse, join, and normalize** - stream-parse both CSVs, join on the TMDB id, normalize genres/keywords/cast/crew, filter to `Released`, compute the Bayesian `weighted_rating`
   - [ ] 1c. **TMDB enrichment & batch upsert** - fetch poster/backdrop/certification per film from the TMDB API, map certification to `min_age`, upsert everything in resumable checkpointed batches via an `npm run ingest` script
 - [ ] 2. **Film embeddings** - build one embedding document per film from title, tagline, overview, keywords, top-billed cast and director, embed in resumable batches, and store the vectors alongside the text that produced them
 - [ ] 3. **Browse the catalog** - poster grid with sorting by popularity, rating and release date, paginated, no account needed
