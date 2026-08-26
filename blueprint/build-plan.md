@@ -5,7 +5,7 @@
   - [x] 1b. **CSV parse, join, and normalize** - stream-parse both CSVs, join on the TMDB id, normalize genres/keywords/cast/crew, filter to `Released`, compute the Bayesian `weighted_rating`
   - [x] 1c. **TMDB enrichment & batch upsert** - fetch poster/backdrop/certification per film from the TMDB API, map certification to `min_age`, upsert everything in resumable checkpointed batches via an `npm run ingest` script
 - [x] 2. **Film embeddings** - build one embedding document per film from title, tagline, overview, keywords, top-billed cast and director, embed in resumable batches, and store the vectors alongside the text that produced them
-- [ ] 3. **Browse the catalog** - poster grid with sorting by popularity, rating and release date, paginated, no account needed
+- [x] 3. **Browse the catalog** - poster grid with sorting by popularity, rating and release date, paginated, no account needed
 - [ ] 4. **Film detail page** - overview, genres, runtime, age rating, cast, director and backdrop for a single film
 - [ ] 5. **Keyword and filter search** - find films by title, actor, genre, decade, runtime band and age ceiling using full-text and structured filters
 - [ ] 6. **Natural-language search** - turn "films for children under 10" or "films with Tom Hanks" into filters plus a semantic query, merge lexical and vector results, and show why each result matched
