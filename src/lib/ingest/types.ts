@@ -68,3 +68,9 @@ export interface NormalizedCredits {
   cast: NormalizedCastMember[];
   crew: NormalizedCrewMember[];
 }
+
+export interface EnrichedFilm extends NormalizedFilm {
+  posterPath: string | null;
+  backdropPath: string | null;
+  minAge: number | null;
+}
