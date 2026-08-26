@@ -151,8 +151,12 @@ Next.js (App Router) + TypeScript, npm as the package manager.
 - Build: `npm run build`
 - Production server: `npm run start`
 - Lint: `npm run lint`
+- Test: `npm test` (Vitest, single run) / `npm run test:watch` (watch mode)
 
-No `test` command yet, so testing is not a gate. Run `/tests` or `$tests` to add
-a unit test runner and update this section with the real test commands. No
-`verify` command yet either; run `/ci` or `$ci` to define one once there is more
-than build/lint to combine.
+Tests are a gate: a build step that adds in-scope logic (parsers, formatters,
+validators, server actions) must ship a passing test in the same diff. UI and
+integration-only steps still ride on screenshot plus build evidence. See the
+Testing section of `coding-standards.md`.
+
+No `verify` command yet; run `/ci` or `$ci` to define one that combines
+typecheck, test, and build into a single command.

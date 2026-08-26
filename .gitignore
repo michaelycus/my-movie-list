@@ -43,3 +43,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# references
+references/tmdb_5000_credits.csv
+references/tmdb_5000_movies.csv
