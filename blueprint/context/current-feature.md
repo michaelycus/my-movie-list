@@ -89,7 +89,7 @@ Build one step at a time, never the whole feature at once.
   without a network call, a successful completion returning the trimmed
   paragraph, and a failed/empty-content response degrading to `null`;
   `npm test` passes.
-- [ ] **Step 2 - rationale route** -
+- [x] **Step 2 - rationale route** -
   `src/app/api/sessions/[id]/rationale/route.ts` plus `route.test.ts`
   mirroring the recommendations route's mocked-dependency style (mocking
   `getSessionDetail`, `getMovieDetail`, `writeGroupRationale`). *Done when:*
