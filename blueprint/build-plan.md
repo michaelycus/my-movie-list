@@ -13,7 +13,7 @@
   - [x] 6b. **Free-text query parsing** - OpenRouter call that turns free text into `{filters, semanticQuery}`, validated against the existing filter contract
   - [x] 6c. **Hybrid retrieval & merge** - run full-text and vector retrieval in parallel, merge with Reciprocal Rank Fusion, apply the `weighted_rating` boost, and derive a "why this matched" reason per result
   - [x] 6d. **Search route + UI** - `/api/search` Route Handler wiring parse -> embed/cache -> retrieve -> merge, plus the natural-language search box and match reasons on `/`
-- [ ] 7. **Google sign-in** - authenticate through Supabase, create a profile on first login, and protect the session routes
+- [x] 7. **Google sign-in** - authenticate through Supabase, create a profile on first login, and protect the session routes
 - [ ] 8. **Friend profiles** - create, rename, edit and delete friends owned by the signed-in account
 - [ ] 9. **Preference questionnaire** - guided flow that collects the free-text and structured preference answers and saves them to the friend
 - [ ] 10. **Poster calibration step** - tap loved it / not for me on eight popular films to enrich a friend's profile without typing
