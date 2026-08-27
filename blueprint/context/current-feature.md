@@ -51,12 +51,12 @@ accent button matching the existing "See recommendations" trigger).
   takes `sessionId` and the current top-ranked `GroupRankedMovie`. A "Why
   this pick?" button posts to the new route and renders the returned
   paragraph, a small "Couldn't write a rationale right now." fallback when
-  `rationale` is `null`, or an error state on request failure. Resets to
-  idle whenever the passed-in movie's `id` changes (the slider can change
-  the top pick), so a stale paragraph never lingers under a different title.
+  `rationale` is `null`, or an error state on request failure.
 - `RecommendationsPanel` renders `<GroupPickRationale>` for
   `rankedMovies[0]` once `status === "success"`, between the
-  `ConsensusSlider` and the poster grid.
+  `ConsensusSlider` and the poster grid, keyed on `rankedMovies[0].id` so a
+  slider-driven change of the top pick remounts it fresh instead of leaving
+  a stale paragraph under a different title.
 
 ## Out of scope
 
@@ -96,7 +96,7 @@ Build one step at a time, never the whole feature at once.
   tests cover invalid id (400), missing auth (401), missing session or movie
   (404), and a happy path returning `{ rationale }`; `npm test` and
   `npm run build` pass.
-- [ ] **Step 3 - `GroupPickRationale` + wiring** - new component plus its
+- [x] **Step 3 - `GroupPickRationale` + wiring** - new component plus its
   `RecommendationsPanel` wiring. *Done when:* `npm run build` and
   `npm run lint` pass; a real dev-server check confirms the route still
   401s with no auth cookie (same smoke check 14c/15 used); UI/integration

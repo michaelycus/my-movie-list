@@ -5,6 +5,7 @@ import { PosterCard } from "@/components/catalog/PosterCard";
 import { GroupScoreBar } from "@/components/sessions/GroupScoreBar";
 import { ParticipantFitList } from "@/components/sessions/ParticipantFitList";
 import { ConsensusSlider } from "@/components/sessions/ConsensusSlider";
+import { GroupPickRationale } from "@/components/sessions/GroupPickRationale";
 import { computeGroupScore } from "@/lib/sessions/groupScore";
 import type { GroupRankedMovie } from "@/types/recommendation";
 import type { SessionParticipant } from "@/types/session";
@@ -87,6 +88,9 @@ export function RecommendationsPanel({
       {status === "success" && (
         <>
           <ConsensusSlider value={consensusWeight} onChange={setConsensusWeight} />
+          {rankedMovies[0] && (
+            <GroupPickRationale key={rankedMovies[0].id} sessionId={sessionId} movie={rankedMovies[0]} />
+          )}
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
             {rankedMovies.map((movie) => (
               <PosterCard
