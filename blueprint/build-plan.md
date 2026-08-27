@@ -24,7 +24,7 @@
   - [x] 14a. **Score-group RPC** - a `score_group` Postgres function that ranks the catalog for a room of participant embeddings under the room's combined hard filters, using 60/40 consensus/least-misery aggregation, plus a typed TS wrapper
   - [x] 14b. **Group recommendation assembly** - gather each scored participant's taste embedding (blended with tonight's mood when given), resolve the room's combined hard filters, call `score_group`, and return a typed ranked shortlist
   - [x] 14c. **Recommendations on the session page** - wire the shortlist into `/sessions/[id]`, replacing the "coming in a later feature" placeholder, with poster cards and a neon group-score bar
-- [ ] 15. **Per-participant fit breakdown** - show how well each shortlisted film suits each person, and a consensus-versus-adventurous control that re-ranks live
+- [x] 15. **Per-participant fit breakdown** - show how well each shortlisted film suits each person, and a consensus-versus-adventurous control that re-ranks live
 - [ ] 16. **Group pick rationale** - generate a short written explanation naming each participant and why the chosen film works for them
 - [ ] 17. **Save and revisit sessions** - record date, participants, chosen film and rationale, and list past sessions
 - [ ] 18. **Seen list** - mark films as already watched so they stop appearing in that group's recommendations

@@ -62,7 +62,7 @@ export default async function SessionDetailPage({ params }: PageProps<"/sessions
         youngestViewerAge={session.youngestViewerAge}
       />
 
-      <RecommendationsPanel sessionId={session.id} />
+      <RecommendationsPanel sessionId={session.id} participants={session.participants} />
     </main>
   );
 }
