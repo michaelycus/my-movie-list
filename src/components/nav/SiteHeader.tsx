@@ -20,6 +20,12 @@ export async function SiteHeader() {
       </Link>
       {claims ? (
         <form action={signOut} className="flex items-center gap-3">
+          <Link
+            href="/friends"
+            className="text-sm text-muted-foreground transition-colors hover:text-neon-cyan"
+          >
+            Friends
+          </Link>
           <span className="flex items-center gap-2 text-sm text-muted-foreground">
             {/* Plain <img>, not next/image: Google serves avatars from several
                 lh*.googleusercontent.com subdomains, not worth widening
