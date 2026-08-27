@@ -11,9 +11,11 @@ function releaseYear(releaseDate: string | null): string | null {
 export function PosterCard({
   movie,
   badge,
+  footer,
 }: {
   movie: BrowseMovie;
   badge?: { label: string };
+  footer?: React.ReactNode;
 }) {
   const year = releaseYear(movie.releaseDate);
   const rating = movie.weightedRating;
@@ -56,6 +58,7 @@ export function PosterCard({
           )}
         </div>
       </Link>
+      {footer}
     </article>
   );
 }
