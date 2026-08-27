@@ -15,7 +15,7 @@
   - [x] 6d. **Search route + UI** - `/api/search` Route Handler wiring parse -> embed/cache -> retrieve -> merge, plus the natural-language search box and match reasons on `/`
 - [x] 7. **Google sign-in** - authenticate through Supabase, create a profile on first login, and protect the session routes
 - [x] 8. **Friend profiles** - create, rename, edit and delete friends owned by the signed-in account
-- [ ] 9. **Preference questionnaire** - guided flow that collects the free-text and structured preference answers and saves them to the friend
+- [x] 9. **Preference questionnaire** - guided flow that collects the free-text and structured preference answers and saves them to the friend
 - [ ] 10. **Poster calibration step** - tap loved it / not for me on eight popular films to enrich a friend's profile without typing
 - [ ] 11. **Friend taste embedding** - synthesise the answers into a paragraph, embed it, blend in the calibration picks, and refresh the vector whenever answers change
 - [ ] 12. **Create a film session** - name a session and pick participants from existing friends, with inline friend creation that doesn't lose the session

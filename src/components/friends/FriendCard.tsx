@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState, useTransition } from "react";
 import { deleteFriend, updateFriend } from "@/actions/friends";
 import type { Friend } from "@/types/friend";
@@ -86,6 +87,12 @@ export function FriendCard({ friend }: { friend: Friend }) {
           <span className="text-sm font-medium text-foreground">{friend.displayName}</span>
         </div>
         <div className="flex items-center gap-2">
+          <Link
+            href={`/friends/${friend.id}/questionnaire`}
+            className="rounded-full border border-border px-3 py-1.5 text-sm text-foreground transition-colors hover:border-neon-cyan hover:text-neon-cyan"
+          >
+            {friend.hasAnswers ? "Edit answers" : "Take questionnaire"}
+          </Link>
           <button
             type="button"
             onClick={() => setMode("edit")}
