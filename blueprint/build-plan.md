@@ -18,7 +18,7 @@
 - [x] 9. **Preference questionnaire** - guided flow that collects the free-text and structured preference answers and saves them to the friend
 - [x] 10. **Poster calibration step** - tap loved it / not for me on eight popular films to enrich a friend's profile without typing
 - [x] 11. **Friend taste embedding** - synthesise the answers into a paragraph, embed it, blend in the calibration picks, and refresh the vector whenever answers change
-- [ ] 12. **Create a film session** - name a session and pick participants from existing friends, with inline friend creation that doesn't lose the session
+- [x] 12. **Create a film session** - name a session and pick participants from existing friends, with inline friend creation that doesn't lose the session
 - [ ] 13. **Tonight's mood** - capture each participant's mood, tonight's constraints and the youngest viewer in the room at session start
 - [ ] 14. **Group recommendations** - apply the room's combined hard filters, score every candidate per participant, and rank with the least-misery aggregation
 - [ ] 15. **Per-participant fit breakdown** - show how well each shortlisted film suits each person, and a consensus-versus-adventurous control that re-ranks live

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { requireOwnerId } from "@/lib/supabase/owner";
 import { parseFriendInput } from "@/lib/friends/validation";
 import {
   deriveHardFilters,
@@ -21,17 +22,6 @@ type ActionResult<T = undefined> =
 
 const friendIdSchema = z.string().uuid();
 const movieIdSchema = z.number().int().positive();
-
-// getClaims(), not getUser(): verifies locally against a cached JWKS, same
-// call src/proxy.ts and SiteHeader already use - no redundant Auth-server
-// round trip per action call.
-async function requireOwnerId(
-  supabase: Awaited<ReturnType<typeof createClient>>
-): Promise<string | null> {
-  const { data } = await supabase.auth.getClaims();
-  const sub = data?.claims?.sub;
-  return typeof sub === "string" ? sub : null;
-}
 
 // Re-embeds a friend's taste profile after their answers or calibration
 // picks change (feature 11). Answers-less friends (calibration-only, before

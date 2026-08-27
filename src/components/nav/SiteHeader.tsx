@@ -26,6 +26,12 @@ export async function SiteHeader() {
           >
             Friends
           </Link>
+          <Link
+            href="/sessions/new"
+            className="text-sm text-muted-foreground transition-colors hover:text-neon-cyan"
+          >
+            Sessions
+          </Link>
           <span className="flex items-center gap-2 text-sm text-muted-foreground">
             {/* Plain <img>, not next/image: Google serves avatars from several
                 lh*.googleusercontent.com subdomains, not worth widening
