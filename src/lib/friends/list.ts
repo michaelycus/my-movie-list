@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { parseCalibrationPicks } from "@/lib/friends/calibration";
 import type { Friend, FriendDetail } from "@/types/friend";
 import type { QuestionnaireAnswers } from "@/types/questionnaire";
 
@@ -18,8 +19,12 @@ interface FriendDetailRow {
 }
 
 // `answers` defaults to '{}' until the questionnaire is first saved (feature 9).
+// Checked via a required questionnaire field rather than "any key present" -
+// `answers` can hold only `calibrationPicks` (feature 10) if a friend does the
+// poster step before ever filling in the questionnaire, and that alone
+// shouldn't count as "answered".
 function hasAnswers(answers: Record<string, unknown> | null): boolean {
-  return answers != null && Object.keys(answers).length > 0;
+  return typeof answers?.lovedFilm === "string" && answers.lovedFilm.length > 0;
 }
 
 // Scoped by owner_id explicitly, not just left to RLS, per coding-standards.md.
@@ -68,5 +73,6 @@ export async function getFriend(
     answers: hasAnswers(data.answers)
       ? (data.answers as unknown as QuestionnaireAnswers)
       : null,
+    calibrationPicks: parseCalibrationPicks(data.answers?.calibrationPicks),
   };
 }

@@ -1,4 +1,5 @@
 import type { QuestionnaireAnswers } from "@/types/questionnaire";
+import type { CalibrationPick } from "@/types/calibration";
 
 /** Shape of one friend as rendered on the /friends page. */
 export interface Friend {
@@ -15,4 +16,5 @@ export interface FriendDetail {
   displayName: string;
   avatarEmoji: string | null;
   answers: QuestionnaireAnswers | null;
+  calibrationPicks: CalibrationPick[];
 }

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { CALIBRATION_POOL_SIZE } from "@/lib/friends/calibration";
 import type { BrowseMovie } from "@/types/movie";
 
 export type BrowseSort = "popularity" | "rating" | "release_date";
@@ -283,6 +284,26 @@ export async function getBrowseMovies(
     movies: (data ?? []).map(toBrowseMovie),
     totalCount,
   };
+}
+
+// Popularity is a moving TMDB signal, so this pool is recomputed on every
+// visit rather than pinned - see current-feature.md's Out of scope note. A
+// friend's earlier picks stay stored even if the film later drops out of it.
+export async function getCalibrationMovies(): Promise<BrowseMovie[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("movies")
+    .select(
+      "id, title, poster_path, release_date, vote_average, weighted_rating, popularity"
+    )
+    .not("poster_path", "is", null)
+    .order("popularity", { ascending: false, nullsFirst: false })
+    .limit(CALIBRATION_POOL_SIZE)
+    .returns<MovieRow[]>();
+
+  if (error) throw error;
+
+  return (data ?? []).map(toBrowseMovie);
 }
 
 interface GenreRow {
