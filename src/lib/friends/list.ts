@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { parseCalibrationPicks } from "@/lib/friends/calibration";
+import { hasQuestionnaireAnswers } from "@/lib/friends/questionnaire";
 import type { Friend, FriendDetail } from "@/types/friend";
 import type { QuestionnaireAnswers } from "@/types/questionnaire";
 
@@ -16,15 +17,6 @@ interface FriendDetailRow {
   display_name: string;
   avatar_emoji: string | null;
   answers: Record<string, unknown> | null;
-}
-
-// `answers` defaults to '{}' until the questionnaire is first saved (feature 9).
-// Checked via a required questionnaire field rather than "any key present" -
-// `answers` can hold only `calibrationPicks` (feature 10) if a friend does the
-// poster step before ever filling in the questionnaire, and that alone
-// shouldn't count as "answered".
-function hasAnswers(answers: Record<string, unknown> | null): boolean {
-  return typeof answers?.lovedFilm === "string" && answers.lovedFilm.length > 0;
 }
 
 // Scoped by owner_id explicitly, not just left to RLS, per coding-standards.md.
@@ -44,7 +36,7 @@ export async function getFriends(ownerId: string): Promise<Friend[]> {
     displayName: row.display_name,
     avatarEmoji: row.avatar_emoji,
     updatedAt: row.updated_at,
-    hasAnswers: hasAnswers(row.answers),
+    hasAnswers: hasQuestionnaireAnswers(row.answers),
   }));
 }
 
@@ -70,7 +62,7 @@ export async function getFriend(
     id: data.id,
     displayName: data.display_name,
     avatarEmoji: data.avatar_emoji,
-    answers: hasAnswers(data.answers)
+    answers: hasQuestionnaireAnswers(data.answers)
       ? (data.answers as unknown as QuestionnaireAnswers)
       : null,
     calibrationPicks: parseCalibrationPicks(data.answers?.calibrationPicks),

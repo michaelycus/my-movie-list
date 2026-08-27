@@ -74,6 +74,16 @@ export function parseQuestionnaireInput(raw: unknown): ParseQuestionnaireInputRe
   return { success: true, data: result.data as QuestionnaireAnswers };
 }
 
+/** Whether a friend has completed the questionnaire (feature 9) at all - the
+ * one required field that's always present once saved. Shared by list.ts
+ * (display) and the taste-embedding refresh (feature 11), which both need to
+ * tell "no answers yet" apart from "calibration picks only" (feature 10). */
+export function hasQuestionnaireAnswers(
+  answers: Record<string, unknown> | null | undefined
+): boolean {
+  return typeof answers?.lovedFilm === "string" && answers.lovedFilm.length > 0;
+}
+
 /** Reads the multi-value FormData fields Zod's plain object parsing can't see. */
 export function readQuestionnaireFormData(formData: FormData) {
   return {

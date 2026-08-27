@@ -6,10 +6,14 @@ import { createClient } from "@/lib/supabase/server";
 import { parseFriendInput } from "@/lib/friends/validation";
 import {
   deriveHardFilters,
+  hasQuestionnaireAnswers,
   parseQuestionnaireInput,
   readQuestionnaireFormData,
 } from "@/lib/friends/questionnaire";
 import { parseCalibrationPicks, upsertCalibrationPick } from "@/lib/friends/calibration";
+import { computeTasteEmbedding } from "@/lib/friends/taste";
+import { getGenres } from "@/lib/movies/browse";
+import type { QuestionnaireAnswers } from "@/types/questionnaire";
 
 type ActionResult<T = undefined> =
   | { success: true; data: T }
@@ -27,6 +31,43 @@ async function requireOwnerId(
   const { data } = await supabase.auth.getClaims();
   const sub = data?.claims?.sub;
   return typeof sub === "string" ? sub : null;
+}
+
+// Re-embeds a friend's taste profile after their answers or calibration
+// picks change (feature 11). Answers-less friends (calibration-only, before
+// ever completing the questionnaire) are skipped - there's no paragraph to
+// embed yet. Errors are logged, never thrown: an OpenAI outage or bad key
+// shouldn't turn a successful questionnaire/calibration save into a failed
+// one, same degrade-gracefully approach as natural-language search.
+async function refreshTasteEmbedding(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  friendId: string,
+  ownerId: string,
+  answers: Record<string, unknown>
+): Promise<void> {
+  if (!hasQuestionnaireAnswers(answers)) return;
+
+  try {
+    const genres = await getGenres();
+    const calibrationPicks = parseCalibrationPicks(answers.calibrationPicks);
+    const { tasteText, tasteEmbedding } = await computeTasteEmbedding(
+      supabase,
+      process.env.OPENAI_API_KEY!,
+      answers as unknown as QuestionnaireAnswers,
+      calibrationPicks,
+      genres
+    );
+
+    const { error } = await supabase
+      .from("friends")
+      .update({ taste_text: tasteText, taste_embedding: tasteEmbedding })
+      .eq("id", friendId)
+      .eq("owner_id", ownerId);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error("refreshTasteEmbedding failed", error);
+  }
 }
 
 function readFriendInput(formData: FormData) {
@@ -144,11 +185,13 @@ export async function saveQuestionnaire(
     (current?.answers as Record<string, unknown> | null)?.calibrationPicks
   );
 
+  const mergedAnswers = { ...parsed.data, calibrationPicks };
+
   // owner_id scoped explicitly in the query, not left to RLS alone.
   const { error } = await supabase
     .from("friends")
     .update({
-      answers: { ...parsed.data, calibrationPicks },
+      answers: mergedAnswers,
       hard_filters: hardFilters,
       updated_at: new Date().toISOString(),
     })
@@ -156,6 +199,8 @@ export async function saveQuestionnaire(
     .eq("owner_id", ownerId);
 
   if (error) return { success: false, error: "Could not save answers." };
+
+  await refreshTasteEmbedding(supabase, idResult.data, ownerId, mergedAnswers);
 
   revalidatePath(`/friends/${idResult.data}/questionnaire`);
   revalidatePath("/friends");
@@ -195,17 +240,20 @@ export async function saveCalibrationPick(
     parseCalibrationPicks(existingAnswers.calibrationPicks),
     { movieId: movieIdResult.data, liked }
   );
+  const mergedAnswers = { ...existingAnswers, calibrationPicks: updatedPicks };
 
   const { error } = await supabase
     .from("friends")
     .update({
-      answers: { ...existingAnswers, calibrationPicks: updatedPicks },
+      answers: mergedAnswers,
       updated_at: new Date().toISOString(),
     })
     .eq("id", idResult.data)
     .eq("owner_id", ownerId);
 
   if (error) return { success: false, error: "Could not save your pick." };
+
+  await refreshTasteEmbedding(supabase, idResult.data, ownerId, mergedAnswers);
 
   revalidatePath(`/friends/${idResult.data}/questionnaire`);
   return { success: true, data: undefined };
