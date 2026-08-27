@@ -19,7 +19,7 @@
 - [x] 10. **Poster calibration step** - tap loved it / not for me on eight popular films to enrich a friend's profile without typing
 - [x] 11. **Friend taste embedding** - synthesise the answers into a paragraph, embed it, blend in the calibration picks, and refresh the vector whenever answers change
 - [x] 12. **Create a film session** - name a session and pick participants from existing friends, with inline friend creation that doesn't lose the session
-- [ ] 13. **Tonight's mood** - capture each participant's mood, tonight's constraints and the youngest viewer in the room at session start
+- [x] 13. **Tonight's mood** - capture each participant's mood, tonight's constraints and the youngest viewer in the room at session start
 - [ ] 14. **Group recommendations** - apply the room's combined hard filters, score every candidate per participant, and rank with the least-misery aggregation
 - [ ] 15. **Per-participant fit breakdown** - show how well each shortlisted film suits each person, and a consensus-versus-adventurous control that re-ranks live
 - [ ] 16. **Group pick rationale** - generate a short written explanation naming each participant and why the chosen film works for them

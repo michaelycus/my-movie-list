@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { toSessionConstraints } from "@/lib/sessions/mood";
 import type { SessionDetail, SessionParticipant } from "@/types/session";
 
 interface SessionRow {
@@ -6,12 +7,16 @@ interface SessionRow {
   title: string;
   watched_on: string;
   chosen_movie_id: number | null;
+  youngest_viewer_age: number | null;
 }
 
 interface ParticipantRow {
   id: string;
   friend_id: string | null;
   is_host: boolean;
+  mood_tags: string[];
+  mood_note: string | null;
+  constraints: unknown;
 }
 
 interface FriendNameRow {
@@ -29,7 +34,7 @@ export async function getSessionDetail(id: string, ownerId: string): Promise<Ses
 
   const { data: session, error: sessionError } = await supabase
     .from("sessions")
-    .select("id, title, watched_on, chosen_movie_id")
+    .select("id, title, watched_on, chosen_movie_id, youngest_viewer_age")
     .eq("id", id)
     .eq("owner_id", ownerId)
     .maybeSingle()
@@ -40,7 +45,7 @@ export async function getSessionDetail(id: string, ownerId: string): Promise<Ses
 
   const { data: participantRows, error: participantsError } = await supabase
     .from("session_participants")
-    .select("id, friend_id, is_host")
+    .select("id, friend_id, is_host, mood_tags, mood_note, constraints")
     .eq("session_id", session.id)
     .returns<ParticipantRow[]>();
 
@@ -64,8 +69,13 @@ export async function getSessionDetail(id: string, ownerId: string): Promise<Ses
   const friendsById = new Map((friendRows ?? []).map((friend) => [friend.id, friend]));
 
   const participants: SessionParticipant[] = (participantRows ?? []).map((row) => {
+    const moodFields = {
+      moodTags: row.mood_tags,
+      moodNote: row.mood_note,
+      constraints: toSessionConstraints(row.constraints),
+    };
     if (row.is_host) {
-      return { id: row.id, displayName: "You", avatarEmoji: null, isHost: true };
+      return { id: row.id, displayName: "You", avatarEmoji: null, isHost: true, ...moodFields };
     }
     const friend = row.friend_id ? friendsById.get(row.friend_id) : undefined;
     return {
@@ -73,6 +83,7 @@ export async function getSessionDetail(id: string, ownerId: string): Promise<Ses
       displayName: friend?.display_name ?? "Removed friend",
       avatarEmoji: friend?.avatar_emoji ?? null,
       isHost: false,
+      ...moodFields,
     };
   });
 
@@ -81,6 +92,7 @@ export async function getSessionDetail(id: string, ownerId: string): Promise<Ses
     title: session.title,
     watchedOn: session.watched_on,
     chosenMovieId: session.chosen_movie_id,
+    youngestViewerAge: session.youngest_viewer_age,
     participants,
   };
 }

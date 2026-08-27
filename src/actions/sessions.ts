@@ -1,12 +1,17 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { requireOwnerId } from "@/lib/supabase/owner";
 import { parseSessionInput, readSessionFormData } from "@/lib/sessions/validation";
+import { parseMoodInput, readMoodFormData } from "@/lib/sessions/mood";
 
 type ActionResult<T = undefined> =
   | { success: true; data: T }
   | { success: false; error: string };
+
+const sessionIdSchema = z.string().uuid();
 
 export async function createSession(formData: FormData): Promise<ActionResult<{ id: string }>> {
   const supabase = await createClient();
@@ -58,4 +63,67 @@ export async function createSession(formData: FormData): Promise<ActionResult<{ 
   }
 
   return { success: true, data: { id: session.id } };
+}
+
+export async function saveTonightsMood(sessionId: string, formData: FormData): Promise<ActionResult> {
+  const supabase = await createClient();
+  const ownerId = await requireOwnerId(supabase);
+  if (!ownerId) return { success: false, error: "Sign in to manage sessions." };
+
+  const idResult = sessionIdSchema.safeParse(sessionId);
+  if (!idResult.success) return { success: false, error: "Invalid session." };
+
+  const { data: session, error: sessionError } = await supabase
+    .from("sessions")
+    .select("id")
+    .eq("id", idResult.data)
+    .eq("owner_id", ownerId)
+    .maybeSingle();
+
+  if (sessionError) return { success: false, error: "Could not verify session." };
+  if (!session) return { success: false, error: "Session not found." };
+
+  // The trusted list of participant ids the form is allowed to write to - a
+  // tampered participant id from a different session must fail here, not
+  // just be silently unreachable later, same pattern createSession already
+  // uses for friendIds.
+  const { data: participantRows, error: participantsError } = await supabase
+    .from("session_participants")
+    .select("id")
+    .eq("session_id", idResult.data);
+
+  if (participantsError) return { success: false, error: "Could not load participants." };
+
+  const participantIds = (participantRows ?? []).map((row) => row.id);
+  const parsed = parseMoodInput(readMoodFormData(formData, participantIds));
+  if (!parsed.success) return { success: false, error: parsed.error };
+
+  const updates = await Promise.all(
+    parsed.data.participants.map((participant) =>
+      supabase
+        .from("session_participants")
+        .update({
+          mood_tags: participant.moodTags,
+          mood_note: participant.moodNote,
+          constraints: participant.constraints,
+        })
+        .eq("id", participant.participantId)
+        .eq("session_id", idResult.data)
+    )
+  );
+
+  if (updates.some((result) => result.error)) {
+    return { success: false, error: "Could not save everyone's mood." };
+  }
+
+  const { error: sessionUpdateError } = await supabase
+    .from("sessions")
+    .update({ youngest_viewer_age: parsed.data.youngestViewerAge })
+    .eq("id", idResult.data)
+    .eq("owner_id", ownerId);
+
+  if (sessionUpdateError) return { success: false, error: "Could not save the youngest viewer's age." };
+
+  revalidatePath(`/sessions/${idResult.data}`);
+  return { success: true, data: undefined };
 }

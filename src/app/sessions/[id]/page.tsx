@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionDetail } from "@/lib/sessions/detail";
+import { TonightsMoodForm } from "@/components/sessions/TonightsMoodForm";
 import type { SessionDetail } from "@/types/session";
 
 const sessionIdSchema = z.string().uuid();
@@ -54,8 +55,14 @@ export default async function SessionDetailPage({ params }: PageProps<"/sessions
         </ul>
       </section>
 
+      <TonightsMoodForm
+        sessionId={session.id}
+        participants={session.participants}
+        youngestViewerAge={session.youngestViewerAge}
+      />
+
       <p className="rounded-lg border border-neon-cyan/40 bg-surface px-4 py-6 text-center text-muted-foreground">
-        Mood capture and recommendations are coming in a later feature.
+        Recommendations are coming in a later feature.
       </p>
     </main>
   );
