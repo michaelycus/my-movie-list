@@ -9,8 +9,10 @@ export type AgeCeiling = 0 | 10 | 12 | 14 | 16 | 17 | 18;
 export const PAGE_SIZE = 24;
 
 // The certifications actually present in min_age - anything else in the URL
-// is treated as absent rather than an unknown ceiling.
-const AGE_CEILINGS: readonly AgeCeiling[] = [0, 10, 12, 14, 16, 17, 18];
+// is treated as absent rather than an unknown ceiling. Exported so other
+// modules (e.g. search/parse.ts) validate against the same list instead of
+// redeclaring it.
+export const AGE_CEILINGS: readonly AgeCeiling[] = [0, 10, 12, 14, 16, 17, 18];
 
 export interface BrowseParams {
   sort: BrowseSort;
@@ -166,7 +168,9 @@ const SORT_COLUMNS: Record<BrowseSort, string> = {
   release_date: "release_date",
 };
 
-interface MovieRow {
+/** Movies row shape shared with match.ts's match_movies RPC wrapper - keep
+ * the two column sets in sync rather than redefining them twice. */
+export interface MovieRow {
   id: number;
   title: string;
   poster_path: string | null;
@@ -206,7 +210,7 @@ interface FilterableQuery<Self> {
 // comparison semantics already exclude those nulls from a gte/lte filter
 // (NULL <= x is NULL, not true), which is exactly the "unknown isn't safe"
 // behavior these filters need - no extra null-handling required.
-function applyFilters<Q extends FilterableQuery<Q>>(
+export function applyFilters<Q extends FilterableQuery<Q>>(
   query: Q,
   params: BrowseParams
 ): Q {

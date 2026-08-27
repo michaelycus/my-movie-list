@@ -13,6 +13,7 @@ import { SortControl } from "@/components/catalog/SortControl";
 import { Pagination } from "@/components/catalog/Pagination";
 import { SearchBar } from "@/components/catalog/SearchBar";
 import { FilterBar } from "@/components/catalog/FilterBar";
+import { NaturalLanguageSearchBar } from "@/components/catalog/NaturalLanguageSearchBar";
 
 export default async function Home({ searchParams }: PageProps<"/">) {
   const params = parseBrowseParams(await searchParams);
@@ -42,6 +43,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         <h1 className="text-2xl font-semibold tracking-tight">CineMood</h1>
         <SortControl params={params} />
       </div>
+      <NaturalLanguageSearchBar />
       {loadFailed ? (
         <p className="rounded-lg border border-neon-amber/40 bg-surface px-4 py-6 text-center text-muted-foreground">
           Couldn&apos;t load the catalog right now. Try refreshing the page.

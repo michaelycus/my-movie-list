@@ -8,7 +8,11 @@
 - [x] 3. **Browse the catalog** - poster grid with sorting by popularity, rating and release date, paginated, no account needed
 - [x] 4. **Film detail page** - overview, genres, runtime, age rating, cast, director and backdrop for a single film
 - [x] 5. **Keyword and filter search** - find films by title, actor, genre, decade, runtime band and age ceiling using full-text and structured filters
-- [ ] 6. **Natural-language search** - turn "films for children under 10" or "films with Tom Hanks" into filters plus a semantic query, merge lexical and vector results, and show why each result matched
+- [x] 6. **Natural-language search** - turn "films for children under 10" or "films with Tom Hanks" into filters plus a semantic query, merge lexical and vector results, and show why each result matched
+  - [x] 6a. **Query cache & vector match RPC** - `query_cache` table and a `match_movies` pgvector RPC, plus typed cache read/write and query-hash helpers, so later steps never touch schema again
+  - [x] 6b. **Free-text query parsing** - OpenRouter call that turns free text into `{filters, semanticQuery}`, validated against the existing filter contract
+  - [x] 6c. **Hybrid retrieval & merge** - run full-text and vector retrieval in parallel, merge with Reciprocal Rank Fusion, apply the `weighted_rating` boost, and derive a "why this matched" reason per result
+  - [x] 6d. **Search route + UI** - `/api/search` Route Handler wiring parse -> embed/cache -> retrieve -> merge, plus the natural-language search box and match reasons on `/`
 - [ ] 7. **Google sign-in** - authenticate through Supabase, create a profile on first login, and protect the session routes
 - [ ] 8. **Friend profiles** - create, rename, edit and delete friends owned by the signed-in account
 - [ ] 9. **Preference questionnaire** - guided flow that collects the free-text and structured preference answers and saves them to the friend

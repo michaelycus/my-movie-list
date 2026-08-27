@@ -8,7 +8,13 @@ function releaseYear(releaseDate: string | null): string | null {
   return releaseDate ? releaseDate.slice(0, 4) : null;
 }
 
-export function PosterCard({ movie }: { movie: BrowseMovie }) {
+export function PosterCard({
+  movie,
+  badge,
+}: {
+  movie: BrowseMovie;
+  badge?: { label: string };
+}) {
   const year = releaseYear(movie.releaseDate);
   const rating = movie.weightedRating;
 
@@ -42,6 +48,11 @@ export function PosterCard({ movie }: { movie: BrowseMovie }) {
           </span>
           {year && (
             <span className="text-xs text-muted-foreground">{year}</span>
+          )}
+          {badge && (
+            <span className="mt-1 w-fit rounded-full border border-neon-cyan px-2 py-0.5 text-[10px] text-neon-cyan">
+              {badge.label}
+            </span>
           )}
         </div>
       </Link>

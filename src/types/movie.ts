@@ -9,6 +9,11 @@ export interface BrowseMovie {
   popularity: number | null;
 }
 
+/** One natural-language search result: a BrowseMovie plus why it matched. */
+export interface SearchResultMovie extends BrowseMovie {
+  matchedVia: "keyword" | "theme" | "keyword+theme";
+}
+
 /** Shape of one film as rendered on its detail page. */
 export interface MovieDetail {
   id: number;
