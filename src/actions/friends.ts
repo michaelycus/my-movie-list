@@ -15,6 +15,7 @@ import { parseCalibrationPicks, upsertCalibrationPick } from "@/lib/friends/cali
 import { computeTasteEmbedding } from "@/lib/friends/taste";
 import { getGenres } from "@/lib/movies/browse";
 import type { QuestionnaireAnswers } from "@/types/questionnaire";
+import { logUsageEvent } from "@/lib/usage/events";
 
 type ActionResult<T = undefined> =
   | { success: true; data: T }
@@ -47,6 +48,11 @@ async function refreshTasteEmbedding(
       calibrationPicks,
       genres
     );
+
+    // Taste embeddings have no cache layer (unlike search's getOrEmbedQuery)
+    // - every call that reaches this point already made a real OpenAI call,
+    // so logging right here (build-plan feature 19b) is accurate.
+    await logUsageEvent(supabase, "embedding_call", ownerId, { context: "taste" });
 
     const { error } = await supabase
       .from("friends")

@@ -15,6 +15,7 @@ import {
 } from "@/lib/search/query-cache";
 import { matchMovies, type MatchedMovieRow } from "@/lib/search/match";
 import type { ParsedSearchQuery } from "@/lib/search/parse";
+import { logUsageEvent } from "@/lib/usage/events";
 
 export interface RankedMovie extends MovieRow {
   matchedVia: "keyword" | "theme" | "keyword+theme";
@@ -134,6 +135,10 @@ export async function getOrEmbedQuery(
 
   const [embedding] = await fetchEmbeddings([text], apiKey);
   await cacheQueryEmbedding(client, { queryHash, queryText: text, embedding });
+  // Logged only on this cache-miss path (build-plan feature 19b) - a cache
+  // hit above returns early and never reaches here, so embedding_call stays
+  // an accurate count of real OpenAI calls, not every query attempted.
+  await logUsageEvent(client, "embedding_call", null);
   return embedding;
 }
 

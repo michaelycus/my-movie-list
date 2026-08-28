@@ -1,7 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+// vi.mock() factories are hoisted above the file's own declarations, so
+// mockClient has to be created via vi.hoisted() to be visible inside them.
+const { mockClient } = vi.hoisted(() => ({
+  mockClient: {
+    mockClient: true,
+    auth: { getClaims: vi.fn().mockResolvedValue({ data: { claims: null } }) },
+  },
+}));
+
 vi.mock("@/lib/supabase/server", () => ({
-  createClient: vi.fn().mockResolvedValue({ mockClient: true }),
+  createClient: vi.fn().mockResolvedValue(mockClient),
 }));
 
 vi.mock("@/lib/movies/browse", () => ({
@@ -16,11 +25,16 @@ vi.mock("@/lib/search/retrieve", () => ({
   searchMovies: vi.fn(),
 }));
 
+vi.mock("@/lib/usage/events", () => ({
+  logUsageEvent: vi.fn(),
+}));
+
 import { GET } from "./route";
 import { getGenres } from "@/lib/movies/browse";
 import { parseSearchQuery } from "@/lib/search/parse";
 import { searchMovies } from "@/lib/search/retrieve";
 import type { RankedMovie } from "@/lib/search/retrieve";
+import { logUsageEvent } from "@/lib/usage/events";
 
 function request(query: string): Request {
   return new Request(`http://localhost/api/search?${query}`);
@@ -84,13 +98,15 @@ describe("GET /api/search", () => {
       "sk-or-test"
     );
     expect(searchMovies).toHaveBeenCalledWith(
-      { mockClient: true },
+      mockClient,
       "sk-openai-test",
       {
         filters: { genreIds: [35], decade: null, runtimeBand: null, maxAge: null },
         semanticQuery: "a lighthearted movie",
       }
     );
+    expect(logUsageEvent).toHaveBeenCalledWith(mockClient, "llm_call", null, { context: "search_parse" });
+    expect(logUsageEvent).toHaveBeenCalledWith(mockClient, "search", null, { resultCount: 1 });
     expect(body).toEqual({
       query: "funny movie",
       semanticQuery: "a lighthearted movie",

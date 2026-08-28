@@ -30,7 +30,7 @@
 - [x] 18. **Seen list** - mark films as already watched so they stop appearing in that group's recommendations
 - [ ] 19. **Admin usage dashboard** - signups, sessions, most-chosen films, search volume and estimated API spend, visible only to the admin role
   - [x] 19a. **Usage-events schema & admin access** - `usage_events` table with insert-open/admin-read-only RLS, admin role seeding from an allowlist env var on sign-in, and a role-gated `/admin` route
-  - [ ] 19b. **Usage-event instrumentation** - log a `usage_events` row at each real touchpoint (signup, session created, film chosen, search performed, embedding/LLM calls) so the dashboard has real data to aggregate
+  - [x] 19b. **Usage-event instrumentation** - log a `usage_events` row at each real touchpoint (signup, session created, film chosen, search performed, embedding/LLM calls) so the dashboard has real data to aggregate
   - [ ] 19c. **Admin usage dashboard UI** - aggregation queries plus the dashboard page: signups over time, sessions created, most-chosen films, search volume (anonymous vs authenticated), embedding/LLM call counts and estimated API spend
 - [ ] 20. **Search cost guardrails** - cache query embeddings, rate-limit anonymous semantic search per IP, and fall back to keyword search when the daily cap is hit
 - [ ] 21. **Installable PWA** - manifest, icons, offline shell and cached posters so the app works on a phone passed around the room

@@ -18,6 +18,10 @@ vi.mock("@/lib/search/query-cache", async (importOriginal) => {
   };
 });
 
+vi.mock("@/lib/usage/events", () => ({
+  logUsageEvent: vi.fn(),
+}));
+
 import {
   filterMatchedRows,
   getOrEmbedQuery,
@@ -35,6 +39,7 @@ import {
   hashQuery,
 } from "@/lib/search/query-cache";
 import type { ParsedSearchQuery } from "@/lib/search/parse";
+import { logUsageEvent } from "@/lib/usage/events";
 
 function movieRow(overrides: Partial<MovieRow> & { id: number }): MovieRow {
   return {
@@ -208,6 +213,7 @@ describe("getOrEmbedQuery", () => {
     expect(result).toEqual([0.1, 0.2]);
     expect(fetchEmbeddings).not.toHaveBeenCalled();
     expect(cacheQueryEmbedding).not.toHaveBeenCalled();
+    expect(logUsageEvent).not.toHaveBeenCalled();
   });
 
   it("embeds and caches on a miss", async () => {
@@ -230,6 +236,7 @@ describe("getOrEmbedQuery", () => {
         embedding: [0.3, 0.4],
       })
     );
+    expect(logUsageEvent).toHaveBeenCalledWith(expect.anything(), "embedding_call", null);
   });
 });
 

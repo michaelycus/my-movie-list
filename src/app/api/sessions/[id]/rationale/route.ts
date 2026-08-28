@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionDetail } from "@/lib/sessions/detail";
 import { getMovieDetail } from "@/lib/movies/detail";
 import { writeGroupRationale } from "@/lib/sessions/rationale";
+import { logUsageEvent } from "@/lib/usage/events";
 
 const idSchema = z.string().uuid();
 const bodySchema = z.object({ movieId: z.coerce.number().int().positive() });
@@ -42,6 +43,10 @@ export async function POST(request: Request, ctx: RouteContext<"/api/sessions/[i
     }
 
     const rationale = await writeGroupRationale(movie, session.participants, process.env.OPENROUTER_API_KEY!);
+    // Logged unconditionally, same "attempted, not confirmed-successful"
+    // caveat as search_parse - writeGroupRationale degrades to null on its
+    // own without signaling why (build-plan feature 19b).
+    await logUsageEvent(supabase, "llm_call", ownerId, { context: "rationale" });
 
     return Response.json({ rationale });
   } catch (error) {

@@ -7,6 +7,7 @@ import { requireOwnerId } from "@/lib/supabase/owner";
 import { parseSessionInput, readSessionFormData } from "@/lib/sessions/validation";
 import { parseMoodInput, readMoodFormData } from "@/lib/sessions/mood";
 import { markParticipantsAsSeen } from "@/lib/sessions/seen";
+import { logUsageEvent } from "@/lib/usage/events";
 
 type ActionResult<T = undefined> =
   | { success: true; data: T }
@@ -63,6 +64,10 @@ export async function createSession(formData: FormData): Promise<ActionResult<{ 
     await supabase.from("sessions").delete().eq("id", session.id);
     return { success: false, error: "Could not seat participants." };
   }
+
+  await logUsageEvent(supabase, "session_created", ownerId, {
+    participantCount: participantRows.length,
+  });
 
   return { success: true, data: { id: session.id } };
 }
@@ -171,6 +176,8 @@ export async function chooseSessionFilm(
     updated.watched_on,
     (participantRows ?? []).map((row) => ({ friendId: row.friend_id }))
   );
+
+  await logUsageEvent(supabase, "film_chosen", ownerId, { movieId: movieIdResult.data });
 
   revalidatePath(`/sessions/${idResult.data}`);
   revalidatePath("/sessions");
