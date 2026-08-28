@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { navPillVariants } from "@/lib/ui";
 import { buildSearchHref, type BrowseParams, type BrowseSort } from "@/lib/movies/browse";
 
 const SORT_OPTIONS: { value: BrowseSort; label: string }[] = [
@@ -18,12 +18,7 @@ export function SortControl({ params }: { params: BrowseParams }) {
             key={option.value}
             href={buildSearchHref(params, { sort: option.value, page: 1 })}
             aria-current={isActive ? "true" : undefined}
-            className={cn(
-              "rounded-full border px-3 py-1 text-sm transition-colors",
-              isActive
-                ? "border-neon-cyan text-neon-cyan"
-                : "border-border text-muted-foreground hover:text-foreground"
-            )}
+            className={navPillVariants({ state: isActive ? "active" : "inactive" })}
           >
             {option.label}
           </Link>

@@ -22,8 +22,8 @@ export function PosterCard({
 
   return (
     <article className="flex flex-col gap-2">
-      <Link href={`/films/${movie.id}`} className="contents">
-        <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface-2">
+      <Link href={`/films/${movie.id}`} className="group contents">
+        <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-surface-2 outline-1 -outline-offset-1 outline-transparent transition-[transform,outline-color,box-shadow] duration-200 ease-out-strong group-hover:scale-[1.03] group-hover:outline-neon-cyan/60 group-hover:shadow-[0_8px_24px_-8px_rgba(34,230,255,0.35)] group-active:scale-[0.98]">
           {movie.posterPath ? (
             <Image
               src={`${POSTER_BASE_URL}${movie.posterPath}`}
@@ -45,7 +45,7 @@ export function PosterCard({
           )}
         </div>
         <div className="flex flex-col">
-          <span className="truncate text-sm font-medium text-foreground">
+          <span className="truncate text-sm font-medium text-foreground transition-colors duration-200 group-hover:text-neon-cyan">
             {movie.title}
           </span>
           {year && (

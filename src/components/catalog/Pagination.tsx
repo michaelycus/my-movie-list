@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { navPillVariants } from "@/lib/ui";
 import { buildSearchHref, type BrowseParams } from "@/lib/movies/browse";
 
 function PageLink({
@@ -14,12 +14,7 @@ function PageLink({
   disabled: boolean;
   children: ReactNode;
 }) {
-  const className = cn(
-    "rounded-full border px-3 py-1 text-sm transition-colors",
-    disabled
-      ? "pointer-events-none border-border text-muted-foreground/50"
-      : "border-border text-foreground hover:border-neon-cyan hover:text-neon-cyan"
-  );
+  const className = navPillVariants({ state: disabled ? "disabled" : "inactive" });
 
   if (disabled) {
     return (

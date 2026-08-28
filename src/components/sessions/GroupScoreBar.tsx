@@ -13,7 +13,7 @@ export function GroupScoreBar({ score }: { score: number }) {
       className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-surface-2"
     >
       <div
-        className="h-full rounded-full"
+        className="h-full rounded-full transition-[width,background-color] duration-300 ease-in-out-strong"
         style={{ width: `${pct}%`, backgroundColor: scoreBarColor(score) }}
       />
     </div>

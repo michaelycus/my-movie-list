@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { saveQuestionnaire } from "@/actions/friends";
+import { buttonVariants } from "@/lib/ui";
 import type { QuestionnaireAnswers } from "@/types/questionnaire";
 
 interface FormState {
@@ -43,10 +44,10 @@ const CONTENT_OPTIONS = [
 ] as const;
 
 const pill =
-  "cursor-pointer rounded-full border border-border px-3 py-1.5 text-sm text-foreground transition-colors peer-checked:border-neon-magenta peer-checked:text-neon-magenta peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-neon-cyan";
+  "cursor-pointer rounded-full border border-border px-3 py-1.5 text-sm text-foreground transition-[color,border-color,transform] duration-150 ease-out-strong active:scale-[0.96] peer-checked:border-neon-magenta peer-checked:text-neon-magenta peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-neon-cyan";
 
 const textarea =
-  "w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-neon-cyan focus:outline-none";
+  "w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-150 focus:border-neon-cyan focus:outline-none focus:ring-2 focus:ring-neon-cyan/20";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -284,11 +285,7 @@ export function QuestionnaireForm({
       </div>
 
       <div className="flex items-center gap-3">
-        <button
-          type="submit"
-          disabled={isPending}
-          className="shrink-0 rounded-full border border-neon-magenta px-4 py-2 text-sm text-neon-magenta transition-colors hover:bg-neon-magenta/10 disabled:opacity-50"
-        >
+        <button type="submit" disabled={isPending} className={buttonVariants({ intent: "primary" })}>
           {isPending ? "Saving…" : "Save answers"}
         </button>
         {state.saved && <span className="text-sm text-neon-lime">Saved.</span>}

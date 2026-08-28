@@ -4,6 +4,7 @@ import { useActionState, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createSession } from "@/actions/sessions";
 import { createFriend } from "@/actions/friends";
+import { buttonVariants } from "@/lib/ui";
 import type { Friend } from "@/types/friend";
 
 interface FormState {
@@ -89,7 +90,7 @@ export function NewSessionForm({ friends: initialFriends }: { friends: Friend[] 
           required
           maxLength={60}
           placeholder="Friday movie night"
-          className="rounded-full border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-neon-cyan focus:outline-none"
+          className="rounded-full border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-150 focus:border-neon-cyan focus:outline-none focus:ring-2 focus:ring-neon-cyan/20"
         />
       </div>
 
@@ -127,7 +128,7 @@ export function NewSessionForm({ friends: initialFriends }: { friends: Friend[] 
               onChange={(event) => setAddFriendName(event.target.value)}
               maxLength={40}
               placeholder="Friend's name"
-              className="rounded-full border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-neon-cyan focus:outline-none"
+              className="rounded-full border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-150 focus:border-neon-cyan focus:outline-none focus:ring-2 focus:ring-neon-cyan/20"
             />
           </div>
           <input
@@ -136,13 +137,13 @@ export function NewSessionForm({ friends: initialFriends }: { friends: Friend[] 
             maxLength={8}
             placeholder="🎬"
             aria-label="Avatar"
-            className="w-20 rounded-full border border-border bg-background px-4 py-2 text-center text-sm text-foreground placeholder:text-muted-foreground focus:border-neon-cyan focus:outline-none"
+            className="w-20 rounded-full border border-border bg-background px-4 py-2 text-center text-sm text-foreground placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-150 focus:border-neon-cyan focus:outline-none focus:ring-2 focus:ring-neon-cyan/20"
           />
           <button
             type="button"
             onClick={handleAddFriend}
             disabled={isAddingFriend || !addFriendName.trim()}
-            className="shrink-0 rounded-full border border-border px-4 py-2 text-sm text-foreground transition-colors hover:border-neon-cyan hover:text-neon-cyan disabled:opacity-50"
+            className={buttonVariants({ intent: "ghost" })}
           >
             {isAddingFriend ? "Adding…" : "+ Add friend"}
           </button>
@@ -153,7 +154,7 @@ export function NewSessionForm({ friends: initialFriends }: { friends: Friend[] 
       <button
         type="submit"
         disabled={isCreating || selectedIds.size === 0}
-        className="shrink-0 self-start rounded-full border border-neon-magenta px-4 py-2 text-sm text-neon-magenta transition-colors hover:bg-neon-magenta/10 disabled:opacity-50"
+        className={buttonVariants({ intent: "primary", className: "self-start" })}
       >
         {isCreating ? "Creating…" : "Create session"}
       </button>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { navPillVariants } from "@/lib/ui";
 
 export interface PillOption {
   key: string;
@@ -25,12 +25,7 @@ export function PillLinkGroup({
           key={option.key}
           href={option.href}
           aria-current={option.active ? "true" : undefined}
-          className={cn(
-            "rounded-full border px-3 py-1 text-sm transition-colors",
-            option.active
-              ? "border-neon-cyan text-neon-cyan"
-              : "border-border text-muted-foreground hover:text-foreground"
-          )}
+          className={navPillVariants({ state: option.active ? "active" : "inactive" })}
         >
           {option.label}
         </Link>

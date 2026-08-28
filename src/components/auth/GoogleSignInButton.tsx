@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { signInWithGoogle } from "@/actions/auth";
+import { buttonVariants } from "@/lib/ui";
 
 const initialState = { success: false as const, error: "" };
 
@@ -20,7 +21,7 @@ export function GoogleSignInButton({ next }: { next?: string }) {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-full border border-neon-cyan px-5 py-2.5 text-sm font-medium text-neon-cyan transition-colors hover:bg-neon-cyan/10 disabled:opacity-50"
+        className={buttonVariants({ intent: "secondary", size: "lg" })}
       >
         {pending ? "Redirecting..." : "Continue with Google"}
       </button>

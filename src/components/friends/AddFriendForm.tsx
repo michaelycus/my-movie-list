@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { createFriend } from "@/actions/friends";
+import { buttonVariants } from "@/lib/ui";
 
 interface FormState {
   error: string | null;
@@ -40,7 +41,7 @@ export function AddFriendForm() {
           required
           maxLength={40}
           placeholder="Friend's name"
-          className="rounded-full border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-neon-cyan focus:outline-none"
+          className="rounded-full border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-150 focus:border-neon-cyan focus:outline-none focus:ring-2 focus:ring-neon-cyan/20"
         />
       </div>
       <div className="flex flex-col gap-1">
@@ -52,14 +53,10 @@ export function AddFriendForm() {
           name="avatarEmoji"
           maxLength={8}
           placeholder="🎬"
-          className="w-20 rounded-full border border-border bg-background px-4 py-2 text-center text-sm text-foreground placeholder:text-muted-foreground focus:border-neon-cyan focus:outline-none"
+          className="w-20 rounded-full border border-border bg-background px-4 py-2 text-center text-sm text-foreground placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-150 focus:border-neon-cyan focus:outline-none focus:ring-2 focus:ring-neon-cyan/20"
         />
       </div>
-      <button
-        type="submit"
-        disabled={isPending}
-        className="shrink-0 rounded-full border border-neon-magenta px-4 py-2 text-sm text-neon-magenta transition-colors hover:bg-neon-magenta/10 disabled:opacity-50"
-      >
+      <button type="submit" disabled={isPending} className={buttonVariants({ intent: "primary" })}>
         {isPending ? "Adding…" : "Add friend"}
       </button>
       {state.error && <p className="w-full text-sm text-neon-amber">{state.error}</p>}

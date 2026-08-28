@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { chooseSessionFilm } from "@/actions/sessions";
+import { buttonVariants } from "@/lib/ui";
 import type { GroupRankedMovie } from "@/types/recommendation";
 
 type Status = "idle" | "loading" | "error" | "success";
@@ -58,11 +60,19 @@ export function GroupPickRationale({ sessionId, movie }: { sessionId: string; mo
           type="button"
           onClick={handleClick}
           disabled={status === "loading"}
-          className="shrink-0 rounded-full border border-neon-cyan px-4 py-2 text-sm text-neon-cyan transition-colors hover:bg-neon-cyan/10 disabled:opacity-50"
+          className={buttonVariants({ intent: "secondary" })}
         >
+          {status === "loading" && <Loader2 className="size-3.5 animate-spin" aria-hidden />}
           {status === "loading" ? "Writing…" : "Why this pick?"}
         </button>
       </div>
+
+      {status === "loading" && (
+        <div className="flex flex-col gap-2">
+          <div className="h-4 w-full rounded bg-surface-2 motion-safe:animate-pulse" />
+          <div className="h-4 w-2/3 rounded bg-surface-2 motion-safe:animate-pulse" />
+        </div>
+      )}
 
       {status === "error" && (
         <p className="text-sm text-muted-foreground">Couldn&apos;t write a rationale right now. Try again.</p>
@@ -73,20 +83,20 @@ export function GroupPickRationale({ sessionId, movie }: { sessionId: string; mo
       )}
 
       {status === "success" && rationale !== null && (
-        <>
+        <div className="motion-safe:animate-in motion-safe:fade-in motion-safe:duration-300">
           <p className="text-sm text-foreground">{rationale}</p>
-          <div className="flex items-center gap-3">
+          <div className="mt-2 flex items-center gap-3">
             <button
               type="button"
               onClick={handleSave}
               disabled={saveStatus === "saving" || saveStatus === "saved"}
-              className="shrink-0 self-start rounded-full border border-neon-magenta px-4 py-2 text-sm text-neon-magenta transition-colors hover:bg-neon-magenta/10 disabled:opacity-50"
+              className={buttonVariants({ intent: "primary", className: "self-start" })}
             >
               {saveStatus === "saving" ? "Saving…" : saveStatus === "saved" ? "Saved" : "Save this pick"}
             </button>
             {saveStatus === "error" && <span className="text-sm text-neon-amber">Couldn&apos;t save. Try again.</span>}
           </div>
-        </>
+        </div>
       )}
     </div>
   );

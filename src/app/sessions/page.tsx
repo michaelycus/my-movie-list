@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionList } from "@/lib/sessions/list";
 import { SessionList } from "@/components/sessions/SessionList";
+import { buttonVariants } from "@/lib/ui";
 import type { SessionListItem } from "@/types/session";
 
 export default async function SessionsPage() {
@@ -25,10 +26,7 @@ export default async function SessionsPage() {
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-lg font-semibold tracking-tight text-foreground">Sessions</h1>
         {typeof ownerId === "string" && sessions.length > 0 && (
-          <Link
-            href="/sessions/new"
-            className="shrink-0 rounded-full border border-neon-magenta px-4 py-2 text-sm text-neon-magenta transition-colors hover:bg-neon-magenta/10"
-          >
+          <Link href="/sessions/new" className={buttonVariants({ intent: "primary" })}>
             New session
           </Link>
         )}

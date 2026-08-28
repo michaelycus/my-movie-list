@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { saveTonightsMood } from "@/actions/sessions";
 import { MOODS, RUNTIME_OVERRIDE_OPTIONS, type RuntimeOverride } from "@/lib/sessions/mood";
+import { buttonVariants } from "@/lib/ui";
 import type { SessionParticipant } from "@/types/session";
 
 interface FormState {
@@ -19,7 +20,7 @@ const RUNTIME_LABELS: Record<RuntimeOverride, string> = {
 };
 
 const pill =
-  "cursor-pointer rounded-full border border-border px-3 py-1.5 text-sm text-foreground transition-colors peer-checked:border-neon-magenta peer-checked:text-neon-magenta peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-neon-cyan";
+  "cursor-pointer rounded-full border border-border px-3 py-1.5 text-sm text-foreground transition-[color,border-color,transform] duration-150 ease-out-strong active:scale-[0.96] peer-checked:border-neon-magenta peer-checked:text-neon-magenta peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-neon-cyan";
 
 function runtimeOverrideFor(maxRuntime: number | null): RuntimeOverride {
   if (maxRuntime === 120) return "under2h";
@@ -112,7 +113,7 @@ export function TonightsMoodForm({
             rows={2}
             defaultValue={participant.moodNote ?? ""}
             placeholder="Anything else about tonight? (optional)"
-            className="w-full rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-neon-cyan focus:outline-none"
+            className="w-full rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-150 focus:border-neon-cyan focus:outline-none focus:ring-2 focus:ring-neon-cyan/20"
           />
 
           <div className="flex flex-wrap gap-2">
@@ -141,7 +142,7 @@ export function TonightsMoodForm({
           max={17}
           defaultValue={youngestViewerAge ?? ""}
           placeholder="Leave blank if no kids tonight"
-          className="w-64 rounded-full border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-neon-cyan focus:outline-none"
+          className="w-64 rounded-full border border-border bg-background px-4 py-2 text-sm text-foreground placeholder:text-muted-foreground transition-[border-color,box-shadow] duration-150 focus:border-neon-cyan focus:outline-none focus:ring-2 focus:ring-neon-cyan/20"
         />
       </div>
 
@@ -149,7 +150,7 @@ export function TonightsMoodForm({
         <button
           type="submit"
           disabled={isPending}
-          className="shrink-0 self-start rounded-full border border-neon-magenta px-4 py-2 text-sm text-neon-magenta transition-colors hover:bg-neon-magenta/10 disabled:opacity-50"
+          className={buttonVariants({ intent: "primary", className: "self-start" })}
         >
           {isPending ? "Saving…" : "Save tonight's mood"}
         </button>

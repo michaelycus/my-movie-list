@@ -50,6 +50,12 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Stronger custom easings (animations.dev) - the built-in CSS easings read
+     as mushy/weak for UI feedback. out-strong for anything entering/settling
+     (hover, press, dropdowns); in-out-strong for things moving on screen. */
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 /*

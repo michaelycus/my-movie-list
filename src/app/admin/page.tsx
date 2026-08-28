@@ -25,7 +25,7 @@ function SignupsStrip({ signupsByDay }: { signupsByDay: UsageStats["signupsByDay
         {signupsByDay.map((day) => (
           <div key={day.date} className="flex flex-1 flex-col items-center gap-1" title={`${day.date}: ${day.count}`}>
             <div
-              className="w-full rounded-t bg-neon-cyan/70"
+              className="w-full rounded-t bg-neon-cyan/70 transition-[height] duration-300 ease-in-out-strong"
               style={{ height: `${(day.count / max) * 100}%`, minHeight: day.count > 0 ? "2px" : 0 }}
             />
           </div>
@@ -47,8 +47,14 @@ function SearchVolume({ searchVolume }: { searchVolume: UsageStats["searchVolume
     <section className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4">
       <h2 className="text-sm font-medium text-foreground">Search volume</h2>
       <div className="flex h-2 overflow-hidden rounded-full bg-surface-2">
-        <div className="h-full bg-neon-cyan" style={{ width: `${anonPercent}%` }} />
-        <div className="h-full bg-neon-magenta" style={{ width: `${100 - anonPercent}%` }} />
+        <div
+          className="h-full bg-neon-cyan transition-[width] duration-300 ease-in-out-strong"
+          style={{ width: `${anonPercent}%` }}
+        />
+        <div
+          className="h-full bg-neon-magenta transition-[width] duration-300 ease-in-out-strong"
+          style={{ width: `${100 - anonPercent}%` }}
+        />
       </div>
       <div className="flex justify-between text-xs text-muted-foreground">
         <span>Anonymous: {searchVolume.anonymous}</span>

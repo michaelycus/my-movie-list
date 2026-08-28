@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { signOut } from "@/actions/auth";
 import { createClient } from "@/lib/supabase/server";
+import { buttonVariants } from "@/lib/ui";
 
 export async function SiteHeader() {
   const supabase = await createClient();
@@ -41,18 +42,12 @@ export async function SiteHeader() {
             )}
             {typeof fullName === "string" ? fullName : claims.email}
           </span>
-          <button
-            type="submit"
-            className="rounded-full border border-border px-3 py-1.5 text-sm text-foreground transition-colors hover:border-neon-cyan hover:text-neon-cyan"
-          >
+          <button type="submit" className={buttonVariants({ intent: "ghost", size: "sm" })}>
             Sign out
           </button>
         </form>
       ) : (
-        <Link
-          href="/auth/login"
-          className="rounded-full border border-neon-cyan px-3 py-1.5 text-sm text-neon-cyan transition-colors hover:bg-neon-cyan/10"
-        >
+        <Link href="/auth/login" className={buttonVariants({ intent: "secondary", size: "sm" })}>
           Sign in
         </Link>
       )}

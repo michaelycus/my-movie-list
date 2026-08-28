@@ -15,7 +15,7 @@ function picksToMap(picks: CalibrationPick[]): Record<number, Liked> {
 }
 
 const buttonBase =
-  "flex-1 rounded-full border px-2 py-1.5 text-xs font-medium transition-colors disabled:opacity-50";
+  "flex-1 rounded-full border px-2 py-1.5 text-xs font-medium transition-[color,background-color,border-color,transform] duration-150 ease-out-strong active:scale-[0.96] disabled:opacity-50 disabled:active:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface";
 
 function PickButton({
   active,

@@ -1,18 +1,34 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { PosterCard } from "@/components/catalog/PosterCard";
 import { GroupScoreBar } from "@/components/sessions/GroupScoreBar";
 import { ParticipantFitList } from "@/components/sessions/ParticipantFitList";
 import { ConsensusSlider } from "@/components/sessions/ConsensusSlider";
 import { GroupPickRationale } from "@/components/sessions/GroupPickRationale";
 import { computeGroupScore } from "@/lib/sessions/groupScore";
+import { buttonVariants } from "@/lib/ui";
 import type { GroupRankedMovie } from "@/types/recommendation";
 import type { SessionParticipant } from "@/types/session";
 
 type Status = "idle" | "loading" | "error" | "empty" | "success";
 
 const DEFAULT_CONSENSUS_WEIGHT = 0.6; // matches 14a's score_group RPC default
+
+function RecommendationsSkeleton() {
+  return (
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex flex-col gap-2">
+          <div className="aspect-2/3 rounded-lg bg-surface-2 motion-safe:animate-pulse" />
+          <div className="h-4 w-3/4 rounded bg-surface-2 motion-safe:animate-pulse" />
+          <div className="h-1.5 w-full rounded-full bg-surface-2 motion-safe:animate-pulse" />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function RecommendationsPanel({
   sessionId,
@@ -67,11 +83,14 @@ export function RecommendationsPanel({
           type="button"
           onClick={handleClick}
           disabled={status === "loading"}
-          className="shrink-0 rounded-full border border-neon-magenta px-4 py-2 text-sm text-neon-magenta transition-colors hover:bg-neon-magenta/10 disabled:opacity-50"
+          className={buttonVariants({ intent: "primary" })}
         >
+          {status === "loading" && <Loader2 className="size-3.5 animate-spin" aria-hidden />}
           {status === "loading" ? "Finding films…" : "See recommendations"}
         </button>
       </div>
+
+      {status === "loading" && <RecommendationsSkeleton />}
 
       {status === "error" && (
         <p className="rounded-lg border border-neon-amber/40 bg-background px-4 py-3 text-sm text-muted-foreground">
@@ -92,21 +111,26 @@ export function RecommendationsPanel({
             <GroupPickRationale key={rankedMovies[0].id} sessionId={sessionId} movie={rankedMovies[0]} />
           )}
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-            {rankedMovies.map((movie) => (
-              <PosterCard
+            {rankedMovies.map((movie, index) => (
+              <div
                 key={movie.id}
-                movie={movie}
-                footer={
-                  <>
-                    <GroupScoreBar score={movie.groupScore} />
-                    <ParticipantFitList
-                      scoredParticipantIds={scoredParticipantIds}
-                      scores={movie.participantScores}
-                      participants={participants}
-                    />
-                  </>
-                }
-              />
+                className="motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:fill-mode-backwards"
+                style={{ animationDuration: "300ms", animationDelay: `${Math.min(index, 11) * 30}ms` }}
+              >
+                <PosterCard
+                  movie={movie}
+                  footer={
+                    <>
+                      <GroupScoreBar score={movie.groupScore} />
+                      <ParticipantFitList
+                        scoredParticipantIds={scoredParticipantIds}
+                        scores={movie.participantScores}
+                        participants={participants}
+                      />
+                    </>
+                  }
+                />
+              </div>
             ))}
           </div>
         </>
