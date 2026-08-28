@@ -41,6 +41,7 @@ describe("scoreGroup", () => {
       blocked_genres: [27],
       consensus_weight: 0.6,
       match_count: 10,
+      excluded_movie_ids: [],
     });
     expect(result).toEqual([
       {
@@ -67,6 +68,17 @@ describe("scoreGroup", () => {
     expect(client.rpc).toHaveBeenCalledWith(
       "score_group",
       expect.objectContaining({ consensus_weight: 0.4, match_count: 5 })
+    );
+  });
+
+  it("passes excludedMovieIds through, defaulting to an empty array", async () => {
+    const client = mockClient({ data: [], error: null });
+
+    await scoreGroup(client, { ...baseParams, excludedMovieIds: [13, 27] });
+
+    expect(client.rpc).toHaveBeenCalledWith(
+      "score_group",
+      expect.objectContaining({ excluded_movie_ids: [13, 27] })
     );
   });
 

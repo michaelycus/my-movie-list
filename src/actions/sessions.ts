@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireOwnerId } from "@/lib/supabase/owner";
 import { parseSessionInput, readSessionFormData } from "@/lib/sessions/validation";
 import { parseMoodInput, readMoodFormData } from "@/lib/sessions/mood";
+import { markParticipantsAsSeen } from "@/lib/sessions/seen";
 
 type ActionResult<T = undefined> =
   | { success: true; data: T }
@@ -149,11 +150,27 @@ export async function chooseSessionFilm(
     .update({ chosen_movie_id: movieIdResult.data, rationale })
     .eq("id", idResult.data)
     .eq("owner_id", ownerId)
-    .select("id")
+    .select("id, watched_on")
     .maybeSingle();
 
   if (updateError) return { success: false, error: "Could not save this pick." };
   if (!updated) return { success: false, error: "Session not found." };
+
+  // Seen-list marking (build-plan feature 18) is best-effort and happens
+  // after the pick itself is safely saved - see markParticipantsAsSeen's
+  // own error handling.
+  const { data: participantRows } = await supabase
+    .from("session_participants")
+    .select("friend_id")
+    .eq("session_id", idResult.data);
+
+  await markParticipantsAsSeen(
+    supabase,
+    ownerId,
+    movieIdResult.data,
+    updated.watched_on,
+    (participantRows ?? []).map((row) => ({ friendId: row.friend_id }))
+  );
 
   revalidatePath(`/sessions/${idResult.data}`);
   revalidatePath("/sessions");

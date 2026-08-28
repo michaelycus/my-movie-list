@@ -121,6 +121,14 @@ export async function resolveParticipantEmbeddings(
   return { scoredParticipantIds, embeddings };
 }
 
+/** Dedupes seen-movie rows into the id array `scoreGroup` needs. Room-wide,
+ * not per-participant - matches combineHardFilters' "every participant
+ * counts" reasoning: a film any seated person (host included) has already
+ * seen is off the table for the whole group. */
+export function collectSeenMovieIds(rows: { movie_id: number }[]): number[] {
+  return [...new Set(rows.map((row) => row.movie_id))];
+}
+
 interface SessionRow {
   id: string;
   youngest_viewer_age: number | null;
@@ -206,11 +214,25 @@ export async function getGroupRecommendations(
   const { scoredParticipantIds, embeddings } = await resolveParticipantEmbeddings(client, apiKey, inputs);
   const filters = combineHardFilters(inputs, session.youngest_viewer_age);
 
+  // Room-wide seen-list exclusion (build-plan feature 18): the host's own
+  // seen rows have friend_id null, so both branches of this filter are
+  // needed, not just "in friendIds".
+  const seenFilter =
+    friendIds.length > 0 ? `friend_id.is.null,friend_id.in.(${friendIds.join(",")})` : "friend_id.is.null";
+  const { data: seenRows, error: seenError } = await client
+    .from("seen_movies")
+    .select("movie_id")
+    .eq("owner_id", ownerId)
+    .or(seenFilter);
+
+  if (seenError) throw seenError;
+
   const movies = await scoreGroup(client, {
     embeddings,
     maxRuntime: filters.maxRuntime,
     minAgeCeiling: filters.minAgeCeiling,
     blockedGenres: filters.blockedGenres,
+    excludedMovieIds: collectSeenMovieIds(seenRows ?? []),
   });
 
   return { scoredParticipantIds, movies };

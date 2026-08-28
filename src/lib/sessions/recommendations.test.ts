@@ -8,6 +8,7 @@ vi.mock("@/lib/search/retrieve", () => ({
 
 import {
   buildMoodQueryText,
+  collectSeenMovieIds,
   combineHardFilters,
   parseHardFilters,
   resolveParticipantEmbeddings,
@@ -41,6 +42,16 @@ describe("buildMoodQueryText", () => {
 
   it("returns null when there's neither", () => {
     expect(buildMoodQueryText([], null)).toBeNull();
+  });
+});
+
+describe("collectSeenMovieIds", () => {
+  it("dedupes movie ids across rows", () => {
+    expect(collectSeenMovieIds([{ movie_id: 13 }, { movie_id: 27 }, { movie_id: 13 }])).toEqual([13, 27]);
+  });
+
+  it("returns an empty array for no rows", () => {
+    expect(collectSeenMovieIds([])).toEqual([]);
   });
 });
 

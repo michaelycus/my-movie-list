@@ -8,6 +8,7 @@ export interface ScoreGroupParams {
   blockedGenres: number[];
   consensusWeight?: number;
   matchCount?: number;
+  excludedMovieIds?: number[];
 }
 
 interface ScoreGroupRow {
@@ -60,6 +61,7 @@ export async function scoreGroup(
     blocked_genres: params.blockedGenres,
     consensus_weight: params.consensusWeight ?? 0.6,
     match_count: params.matchCount ?? 10,
+    excluded_movie_ids: params.excludedMovieIds ?? [],
   });
 
   if (error) throw error;
