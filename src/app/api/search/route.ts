@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
-import { getGenres } from "@/lib/movies/browse";
+import { getGenres, PAGE_SIZE } from "@/lib/movies/browse";
 import { parseSearchQuery } from "@/lib/search/parse";
 import { searchMovies, type RankedMovie } from "@/lib/search/retrieve";
+import { ipHash, underAnonSemanticSearchCap } from "@/lib/search/anon-rate-limit";
 import type { SearchResultMovie } from "@/types/movie";
 import { logUsageEvent } from "@/lib/usage/events";
 
@@ -44,6 +45,11 @@ export async function GET(request: Request) {
     const { data: claims } = await client.auth.getClaims();
     const userId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;
 
+    // Authenticated searches are never capped - only anonymous ones spend
+    // an OpenAI call with no accountable user behind them (feature 20).
+    const allowSemantic =
+      userId !== null ? true : await underAnonSemanticSearchCap(client, ipHash(request));
+
     // A missing/invalid OPENROUTER_API_KEY or OPENAI_API_KEY doesn't throw
     // here - parseSearchQuery and searchMovies both degrade gracefully
     // (raw-text search, lexical-only results) rather than failing the
@@ -55,8 +61,17 @@ export async function GET(request: Request) {
     // confirmed-successful ones (see current-feature.md's Out of scope).
     await logUsageEvent(client, "llm_call", userId, { context: "search_parse" });
 
-    const results = await searchMovies(client, process.env.OPENAI_API_KEY!, parsed);
-    await logUsageEvent(client, "search", userId, { resultCount: results.length });
+    const results = await searchMovies(
+      client,
+      process.env.OPENAI_API_KEY!,
+      parsed,
+      PAGE_SIZE,
+      allowSemantic
+    );
+    await logUsageEvent(client, "search", userId, {
+      resultCount: results.length,
+      ...(allowSemantic ? {} : { rateLimited: true }),
+    });
 
     return Response.json({
       query: q,

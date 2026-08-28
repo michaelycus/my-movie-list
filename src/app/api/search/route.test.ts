@@ -15,6 +15,7 @@ vi.mock("@/lib/supabase/server", () => ({
 
 vi.mock("@/lib/movies/browse", () => ({
   getGenres: vi.fn(),
+  PAGE_SIZE: 24,
 }));
 
 vi.mock("@/lib/search/parse", () => ({
@@ -25,15 +26,21 @@ vi.mock("@/lib/search/retrieve", () => ({
   searchMovies: vi.fn(),
 }));
 
+vi.mock("@/lib/search/anon-rate-limit", () => ({
+  ipHash: vi.fn().mockReturnValue("hashed-ip"),
+  underAnonSemanticSearchCap: vi.fn(),
+}));
+
 vi.mock("@/lib/usage/events", () => ({
   logUsageEvent: vi.fn(),
 }));
 
 import { GET } from "./route";
-import { getGenres } from "@/lib/movies/browse";
+import { getGenres, PAGE_SIZE } from "@/lib/movies/browse";
 import { parseSearchQuery } from "@/lib/search/parse";
 import { searchMovies } from "@/lib/search/retrieve";
 import type { RankedMovie } from "@/lib/search/retrieve";
+import { underAnonSemanticSearchCap } from "@/lib/search/anon-rate-limit";
 import { logUsageEvent } from "@/lib/usage/events";
 
 function request(query: string): Request {
@@ -87,11 +94,13 @@ describe("GET /api/search", () => {
       semanticQuery: "a lighthearted movie",
     });
     vi.mocked(searchMovies).mockResolvedValue([sampleRanked]);
+    vi.mocked(underAnonSemanticSearchCap).mockResolvedValue(true);
 
     const response = await GET(request("q=funny+movie"));
     const body = await response.json();
 
     expect(response.status).toBe(200);
+    expect(underAnonSemanticSearchCap).toHaveBeenCalledWith(mockClient, "hashed-ip");
     expect(parseSearchQuery).toHaveBeenCalledWith(
       "funny movie",
       sampleGenres,
@@ -103,7 +112,9 @@ describe("GET /api/search", () => {
       {
         filters: { genreIds: [35], decade: null, runtimeBand: null, maxAge: null },
         semanticQuery: "a lighthearted movie",
-      }
+      },
+      PAGE_SIZE,
+      true
     );
     expect(logUsageEvent).toHaveBeenCalledWith(mockClient, "llm_call", null, { context: "search_parse" });
     expect(logUsageEvent).toHaveBeenCalledWith(mockClient, "search", null, { resultCount: 1 });
@@ -122,6 +133,56 @@ describe("GET /api/search", () => {
           matchedVia: "keyword+theme",
         },
       ],
+    });
+  });
+
+  it("never checks the anonymous rate limit for an authenticated request", async () => {
+    vi.mocked(mockClient.auth.getClaims).mockResolvedValueOnce({
+      data: { claims: { sub: "user-1" } },
+    });
+    vi.mocked(getGenres).mockResolvedValue(sampleGenres);
+    vi.mocked(parseSearchQuery).mockResolvedValue({
+      filters: { genreIds: [], decade: null, runtimeBand: null, maxAge: null },
+      semanticQuery: "a lighthearted movie",
+    });
+    vi.mocked(searchMovies).mockResolvedValue([sampleRanked]);
+
+    await GET(request("q=funny+movie"));
+
+    expect(underAnonSemanticSearchCap).not.toHaveBeenCalled();
+    expect(searchMovies).toHaveBeenCalledWith(
+      mockClient,
+      "sk-openai-test",
+      expect.anything(),
+      PAGE_SIZE,
+      true
+    );
+    expect(logUsageEvent).toHaveBeenCalledWith(mockClient, "search", "user-1", {
+      resultCount: 1,
+    });
+  });
+
+  it("falls back to lexical-only and flags the usage event once an anonymous IP is over the cap", async () => {
+    vi.mocked(getGenres).mockResolvedValue(sampleGenres);
+    vi.mocked(parseSearchQuery).mockResolvedValue({
+      filters: { genreIds: [], decade: null, runtimeBand: null, maxAge: null },
+      semanticQuery: "a lighthearted movie",
+    });
+    vi.mocked(searchMovies).mockResolvedValue([sampleRanked]);
+    vi.mocked(underAnonSemanticSearchCap).mockResolvedValue(false);
+
+    await GET(request("q=funny+movie"));
+
+    expect(searchMovies).toHaveBeenCalledWith(
+      mockClient,
+      "sk-openai-test",
+      expect.anything(),
+      PAGE_SIZE,
+      false
+    );
+    expect(logUsageEvent).toHaveBeenCalledWith(mockClient, "search", null, {
+      resultCount: 1,
+      rateLimited: true,
     });
   });
 

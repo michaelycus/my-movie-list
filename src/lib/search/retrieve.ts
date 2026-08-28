@@ -197,12 +197,16 @@ const RETRIEVAL_LIMIT = 200;
  * merges -> slices to `limit`. If embedding fails (OpenAI outage, or the
  * cache-miss fetchEmbeddings call throws), degrades to lexical-only results
  * instead of failing the whole search - lexicalSearch has no dependency on
- * the embedding, so it's kicked off immediately rather than waiting on it. */
+ * the embedding, so it's kicked off immediately rather than waiting on it.
+ * `allowSemantic: false` (feature 20's per-IP daily cap) reaches the same
+ * lexical-only outcome without ever calling OpenAI - the actual cost saved,
+ * not just a filtered response. */
 export async function searchMovies(
   client: SupabaseClient,
   apiKey: string,
   parsed: ParsedSearchQuery,
-  limit: number = PAGE_SIZE
+  limit: number = PAGE_SIZE,
+  allowSemantic: boolean = true
 ): Promise<RankedMovie[]> {
   const lexicalPromise = lexicalSearch(
     client,
@@ -212,6 +216,8 @@ export async function searchMovies(
   );
 
   const vectorPromise = (async (): Promise<MatchedMovieRow[]> => {
+    if (!allowSemantic) return [];
+
     try {
       const embedding = await getOrEmbedQuery(client, apiKey, parsed.semanticQuery);
       return await vectorSearch(client, embedding, parsed.filters, RETRIEVAL_LIMIT);

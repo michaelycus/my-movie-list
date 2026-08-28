@@ -30,7 +30,7 @@ import {
   searchMovies,
   vectorSearch,
 } from "./retrieve";
-import type { MovieRow } from "@/lib/movies/browse";
+import { PAGE_SIZE, type MovieRow } from "@/lib/movies/browse";
 import { matchMovies, type MatchedMovieRow } from "@/lib/search/match";
 import { fetchEmbeddings } from "@/lib/ingest/openai";
 import {
@@ -368,6 +368,26 @@ describe("searchMovies", () => {
     });
 
     expect(result).toEqual([expect.objectContaining({ id: 1, matchedVia: "keyword" })]);
+    expect(matchMovies).not.toHaveBeenCalled();
+  });
+
+  it("skips the embedding call entirely and returns lexical-only results when allowSemantic is false", async () => {
+    const { client } = mockMoviesClient({
+      data: [movieRow({ id: 1 })],
+      error: null,
+    });
+
+    const result = await searchMovies(
+      client,
+      "sk-test",
+      { filters: noFilters, semanticQuery: "funny movie" },
+      PAGE_SIZE,
+      false
+    );
+
+    expect(result).toEqual([expect.objectContaining({ id: 1, matchedVia: "keyword" })]);
+    expect(getCachedQueryEmbedding).not.toHaveBeenCalled();
+    expect(fetchEmbeddings).not.toHaveBeenCalled();
     expect(matchMovies).not.toHaveBeenCalled();
   });
 });
