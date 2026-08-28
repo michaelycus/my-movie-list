@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSerwist } from "@serwist/turbopack";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
@@ -16,4 +17,8 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// This project runs on Turbopack (Next 16 default), which the webpack-based
+// `@serwist/next` package doesn't support - `@serwist/turbopack` compiles
+// the service worker via the route handler at src/app/serwist/[path]/route.ts
+// instead of a webpack plugin.
+export default withSerwist(nextConfig);

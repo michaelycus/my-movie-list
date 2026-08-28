@@ -1,0 +1,11 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <title>CineMood</title>
+  <rect width="512" height="512" fill="#131024" />
+  <defs>
+    <linearGradient id="play" x1="140" y1="120" x2="400" y2="392" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF2E9A" />
+      <stop offset="1" stop-color="#22E6FF" />
+    </linearGradient>
+  </defs>
+  <path d="M198 166 L198 346 L372 256 Z" fill="url(#play)" />
+</svg>
