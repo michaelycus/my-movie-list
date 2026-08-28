@@ -7,6 +7,7 @@ interface SessionRow {
   title: string;
   watched_on: string;
   chosen_movie_id: number | null;
+  rationale: string | null;
   youngest_viewer_age: number | null;
 }
 
@@ -34,7 +35,7 @@ export async function getSessionDetail(id: string, ownerId: string): Promise<Ses
 
   const { data: session, error: sessionError } = await supabase
     .from("sessions")
-    .select("id, title, watched_on, chosen_movie_id, youngest_viewer_age")
+    .select("id, title, watched_on, chosen_movie_id, rationale, youngest_viewer_age")
     .eq("id", id)
     .eq("owner_id", ownerId)
     .maybeSingle()
@@ -92,6 +93,7 @@ export async function getSessionDetail(id: string, ownerId: string): Promise<Ses
     title: session.title,
     watchedOn: session.watched_on,
     chosenMovieId: session.chosen_movie_id,
+    rationale: session.rationale,
     youngestViewerAge: session.youngest_viewer_age,
     participants,
   };

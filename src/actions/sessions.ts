@@ -12,6 +12,7 @@ type ActionResult<T = undefined> =
   | { success: false; error: string };
 
 const sessionIdSchema = z.string().uuid();
+const movieIdSchema = z.coerce.number().int().positive();
 
 export async function createSession(formData: FormData): Promise<ActionResult<{ id: string }>> {
   const supabase = await createClient();
@@ -125,5 +126,36 @@ export async function saveTonightsMood(sessionId: string, formData: FormData): P
   if (sessionUpdateError) return { success: false, error: "Could not save the youngest viewer's age." };
 
   revalidatePath(`/sessions/${idResult.data}`);
+  return { success: true, data: undefined };
+}
+
+// One-way save (build-plan feature 17): once a pick is chosen there's no
+// un-choose or edit path yet, matching this feature's spec'd scope.
+export async function chooseSessionFilm(
+  sessionId: string,
+  movieId: number,
+  rationale: string | null
+): Promise<ActionResult> {
+  const supabase = await createClient();
+  const ownerId = await requireOwnerId(supabase);
+  if (!ownerId) return { success: false, error: "Sign in to manage sessions." };
+
+  const idResult = sessionIdSchema.safeParse(sessionId);
+  const movieIdResult = movieIdSchema.safeParse(movieId);
+  if (!idResult.success || !movieIdResult.success) return { success: false, error: "Invalid session or film." };
+
+  const { data: updated, error: updateError } = await supabase
+    .from("sessions")
+    .update({ chosen_movie_id: movieIdResult.data, rationale })
+    .eq("id", idResult.data)
+    .eq("owner_id", ownerId)
+    .select("id")
+    .maybeSingle();
+
+  if (updateError) return { success: false, error: "Could not save this pick." };
+  if (!updated) return { success: false, error: "Session not found." };
+
+  revalidatePath(`/sessions/${idResult.data}`);
+  revalidatePath("/sessions");
   return { success: true, data: undefined };
 }

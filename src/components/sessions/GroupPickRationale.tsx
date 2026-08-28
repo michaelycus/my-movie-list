@@ -1,16 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { chooseSessionFilm } from "@/actions/sessions";
 import type { GroupRankedMovie } from "@/types/recommendation";
 
 type Status = "idle" | "loading" | "error" | "success";
+type SaveStatus = "idle" | "saving" | "saved" | "error";
 
 // Keyed by movie.id at the call site (RecommendationsPanel) so a slider-
 // driven change of the top pick remounts this component fresh instead of
 // carrying a stale paragraph about a different film.
 export function GroupPickRationale({ sessionId, movie }: { sessionId: string; movie: GroupRankedMovie }) {
+  const router = useRouter();
   const [status, setStatus] = useState<Status>("idle");
   const [rationale, setRationale] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
 
   async function handleClick() {
     if (status === "loading") return;
@@ -29,6 +34,20 @@ export function GroupPickRationale({ sessionId, movie }: { sessionId: string; mo
     } catch {
       setStatus("error");
     }
+  }
+
+  async function handleSave() {
+    if (saveStatus === "saving") return;
+    setSaveStatus("saving");
+    const result = await chooseSessionFilm(sessionId, movie.id, rationale);
+    if (!result.success) {
+      setSaveStatus("error");
+      return;
+    }
+    setSaveStatus("saved");
+    // Session detail page swaps to the persisted "Tonight's pick" section
+    // once chosenMovieId is set - that's server data, so it needs a refresh.
+    router.refresh();
   }
 
   return (
@@ -53,7 +72,22 @@ export function GroupPickRationale({ sessionId, movie }: { sessionId: string; mo
         <p className="text-sm text-muted-foreground">Couldn&apos;t write a rationale right now.</p>
       )}
 
-      {status === "success" && rationale !== null && <p className="text-sm text-foreground">{rationale}</p>}
+      {status === "success" && rationale !== null && (
+        <>
+          <p className="text-sm text-foreground">{rationale}</p>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saveStatus === "saving" || saveStatus === "saved"}
+              className="shrink-0 self-start rounded-full border border-neon-magenta px-4 py-2 text-sm text-neon-magenta transition-colors hover:bg-neon-magenta/10 disabled:opacity-50"
+            >
+              {saveStatus === "saving" ? "Saving…" : saveStatus === "saved" ? "Saved" : "Save this pick"}
+            </button>
+            {saveStatus === "error" && <span className="text-sm text-neon-amber">Couldn&apos;t save. Try again.</span>}
+          </div>
+        </>
+      )}
     </div>
   );
 }

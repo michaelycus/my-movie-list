@@ -25,6 +25,16 @@ export interface SessionDetail {
   title: string;
   watchedOn: string;
   chosenMovieId: number | null;
+  rationale: string | null;
   youngestViewerAge: number | null;
   participants: SessionParticipant[];
+}
+
+/** One row on the /sessions history list (build-plan feature 17) - just
+ * enough to render the list without a per-session movie-detail fetch. */
+export interface SessionListItem {
+  id: string;
+  title: string;
+  watchedOn: string;
+  chosenMovie: { id: number; title: string; posterPath: string | null } | null;
 }

@@ -26,7 +26,7 @@
   - [x] 14c. **Recommendations on the session page** - wire the shortlist into `/sessions/[id]`, replacing the "coming in a later feature" placeholder, with poster cards and a neon group-score bar
 - [x] 15. **Per-participant fit breakdown** - show how well each shortlisted film suits each person, and a consensus-versus-adventurous control that re-ranks live
 - [x] 16. **Group pick rationale** - generate a short written explanation naming each participant and why the chosen film works for them
-- [ ] 17. **Save and revisit sessions** - record date, participants, chosen film and rationale, and list past sessions
+- [x] 17. **Save and revisit sessions** - record date, participants, chosen film and rationale, and list past sessions
 - [ ] 18. **Seen list** - mark films as already watched so they stop appearing in that group's recommendations
 - [ ] 19. **Admin usage dashboard** - signups, sessions, most-chosen films, search volume and estimated API spend, visible only to the admin role
 - [ ] 20. **Search cost guardrails** - cache query embeddings, rate-limit anonymous semantic search per IP, and fall back to keyword search when the daily cap is hit

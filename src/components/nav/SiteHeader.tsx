@@ -27,7 +27,7 @@ export async function SiteHeader() {
             Friends
           </Link>
           <Link
-            href="/sessions/new"
+            href="/sessions"
             className="text-sm text-muted-foreground transition-colors hover:text-neon-cyan"
           >
             Sessions

@@ -48,6 +48,7 @@ const sampleSession: SessionDetail = {
   title: "Movie night",
   watchedOn: "2026-08-27",
   chosenMovieId: null,
+  rationale: null,
   youngestViewerAge: null,
   participants: [
     {
