@@ -38,7 +38,6 @@ function mockAdmin() {
 const film: EnrichedFilm = {
   id: 19995,
   title: "Avatar",
-  originalTitle: "Avatar",
   overview: "A marine on an alien planet.",
   tagline: "Enter the World",
   releaseDate: "2009-12-10",
@@ -50,8 +49,6 @@ const film: EnrichedFilm = {
   weightedRating: 7.1,
   genreIds: [28, 12],
   keywords: ["culture clash", "future"],
-  countries: ["United States of America"],
-  status: "Released",
   posterPath: "/p.jpg",
   backdropPath: "/b.jpg",
   minAge: 10,
@@ -62,7 +59,6 @@ describe("toMovieRow", () => {
     expect(toMovieRow(film)).toEqual({
       id: 19995,
       title: "Avatar",
-      original_title: "Avatar",
       overview: "A marine on an alien planet.",
       tagline: "Enter the World",
       release_date: "2009-12-10",
@@ -77,8 +73,6 @@ describe("toMovieRow", () => {
       min_age: 10,
       genre_ids: [28, 12],
       keywords: ["culture clash", "future"],
-      countries: ["United States of America"],
-      status: "Released",
     });
   });
 });

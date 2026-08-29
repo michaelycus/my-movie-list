@@ -36,7 +36,6 @@ export interface NormalizedGenre {
 export interface NormalizedFilm {
   id: number;
   title: string;
-  originalTitle: string | null;
   overview: string | null;
   tagline: string | null;
   releaseDate: string | null;
@@ -48,8 +47,6 @@ export interface NormalizedFilm {
   weightedRating: number;
   genreIds: number[];
   keywords: string[];
-  countries: string[];
-  status: string;
 }
 
 export interface NormalizedCastMember {

@@ -5,7 +5,6 @@ export function toMovieRow(film: EnrichedFilm) {
   return {
     id: film.id,
     title: film.title,
-    original_title: film.originalTitle,
     overview: film.overview,
     tagline: film.tagline,
     release_date: film.releaseDate,
@@ -20,8 +19,6 @@ export function toMovieRow(film: EnrichedFilm) {
     min_age: film.minAge,
     genre_ids: film.genreIds,
     keywords: film.keywords,
-    countries: film.countries,
-    status: film.status,
   };
 }
 

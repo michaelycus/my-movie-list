@@ -16,15 +16,6 @@ function nullableNumber(value: string): number | null {
   return value === "" ? null : Number(value);
 }
 
-interface RawCountry {
-  name: string;
-}
-
-function parseCountries(json: string): string[] {
-  const raw: RawCountry[] = JSON.parse(json);
-  return raw.map((c) => c.name);
-}
-
 export interface NormalizedCatalog {
   films: NormalizedFilm[];
   credits: NormalizedCredits[];
@@ -74,7 +65,6 @@ export async function normalizeCatalog(
     films.push({
       id,
       title: row.title,
-      originalTitle: nullableString(row.original_title),
       overview: nullableString(row.overview),
       tagline: nullableString(row.tagline),
       releaseDate: nullableString(row.release_date),
@@ -91,8 +81,6 @@ export async function normalizeCatalog(
       ),
       genreIds: parseGenres(row.genres).map((g) => g.id),
       keywords: parseKeywords(row.keywords),
-      countries: parseCountries(row.production_countries),
-      status: row.status,
     });
 
     const rowCredits = creditsById.get(id);
